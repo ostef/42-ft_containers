@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   sfinae.hpp                                         :+:      :+:    :+:   */
+/*   type_traits.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/03 13:43:15 by soumanso          #+#    #+#             */
-/*   Updated: 2022/03/03 13:43:15 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/03/16 16:16:43 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,49 +39,33 @@ namespace ft
 	struct is_integral :
 		public integral_constant<bool, false> {};
 
-	template<class T>
-	struct is_integral<bool> :
-		public integral_constant<bool, true> {};
+#define IS_INTEGRAL(T)\
+	template<>\
+	struct is_integral<T> :\
+		public integral_constant<bool, true> {};\
+	template<>\
+	struct is_integral<const T> :\
+		public integral_constant<bool, true> {};\
+	template<>\
+	struct is_integral<volatile T> :\
+		public integral_constant<bool, true> {};\
+	template<>\
+	struct is_integral<const volatile T> :\
+		public integral_constant<bool, true> {}
 
-	template<class T>
-	struct is_integral<char> :
-		public integral_constant<bool, true> {};
+	IS_INTEGRAL (bool);
+	IS_INTEGRAL (char);
+	IS_INTEGRAL (unsigned char);
+	IS_INTEGRAL (short);
+	IS_INTEGRAL (unsigned short);
+	IS_INTEGRAL (int);
+	IS_INTEGRAL (unsigned int);
+	IS_INTEGRAL (long);
+	IS_INTEGRAL (unsigned long);
+	IS_INTEGRAL (long long);
+	IS_INTEGRAL (unsigned long long);
 
-	template<class T>
-	struct is_integral<unsigned char> :
-		public integral_constant<bool, true> {};
-
-	template<class T>
-	struct is_integral<short> :
-		public integral_constant<bool, true> {};
-
-	template<class T>
-	struct is_integral<unsigned short> :
-		public integral_constant<bool, true> {};
-
-	template<class T>
-	struct is_integral<int> :
-		public integral_constant<bool, true> {};
-
-	template<class T>
-	struct is_integral<unsigned int> :
-		public integral_constant<bool, true> {};
-
-	template<class T>
-	struct is_integral<long> :
-		public integral_constant<bool, true> {};
-
-	template<class T>
-	struct is_integral<unsigned long> :
-		public integral_constant<bool, true> {};
-
-	template<class T>
-	struct is_integral<long long> :
-		public integral_constant<bool, true> {};
-
-	template<class T>
-	struct is_integral<unsigned long long> :
-		public integral_constant<bool, true> {};
+#undef IS_INTEGRAL
 }
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/03 14:27:47 by soumanso          #+#    #+#             */
-/*   Updated: 2022/03/03 14:27:47 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/03/16 15:37:50 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ namespace ft
 	template<class T1, class T2>
 	pair<T1, T2> make_pair (T1 first, T2 second)
 	{
-		return pair (first, second);
+		return pair<T1, T2> (first, second);
 	}
 
 	template<class T1, class T2>

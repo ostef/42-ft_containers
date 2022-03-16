@@ -6,7 +6,7 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/03 13:08:55 by soumanso          #+#    #+#             */
-/*   Updated: 2022/03/03 13:08:55 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/03/16 15:59:22 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ namespace ft
 		typedef typename TIter::pointer           pointer;
 		typedef typename TIter::reference         reference;
 		typedef typename TIter::iterator_category iterator_category;
-	}
+	};
 
 	template<class T>
 	struct iterator_traits<T *>
@@ -41,7 +41,7 @@ namespace ft
 		typedef T                               *pointer;
 		typedef T                               &reference;
 		typedef std::random_access_iterator_tag iterator_category;
-	}
+	};
 
 	template<class T>
 	struct iterator_traits<const T *>
@@ -51,8 +51,9 @@ namespace ft
 		typedef const T                         *pointer;
 		typedef const T                         &reference;
 		typedef std::random_access_iterator_tag iterator_category;
-	}
+	};
 
+/*
 	template<
 		class TCategory,
 		class T,
@@ -68,16 +69,18 @@ namespace ft
 		typedef TPointer   pointer;
 		typedef TReference reference;
 	};
+*/
 
 	template<class TIter>
 	class reverse_iterator
 	{
 	public:
-		typedef          TIter                                     iterator_type;
+		typedef TIter iterator_type;
 		typedef typename iterator_traits<TIter>::iterator_category iterator_category;
-		typedef typename iterator_traits<TIter>::value_type        value_type;
-		typedef typename iterator_traits<TIter>::pointer           pointer;
-		typedef typename iterator_traits<TIter>::reference         reference;
+		typedef typename iterator_traits<TIter>::value_type value_type;
+		typedef typename iterator_traits<TIter>::difference_type difference_type;
+		typedef typename iterator_traits<TIter>::pointer pointer;
+		typedef typename iterator_traits<TIter>::reference reference;
 
 	public:
 		reverse_iterator ()
