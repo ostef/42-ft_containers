@@ -6,7 +6,7 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 20:23:47 by soumanso          #+#    #+#             */
-/*   Updated: 2022/07/21 14:50:44 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/07/21 15:48:05 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -312,36 +312,47 @@ namespace ft
 	template<class T, class TAllocator>
 	void vector<T, TAllocator>::insert (vector<T, TAllocator>::iterator position, vector<T, TAllocator>::size_type n, const vector<T, TAllocator>::value_type &val)
 	{
+		if (n == 0)
+			return;
+
 		size_type index = position - begin ();
 		
 		if (m_size + n > m_capacity)
 			reserve (m_capacity * 2 + n);
 		
-		for (iterator it = end () + n; it != position + n; it--)
-			(*it) = *(it - n);
-		
+		position = begin () + index;
+
+		for (iterator it = end () + n - 1; it != position + n - 1; it--)
+			*it = *(it - n);
+
 		m_size += n;
 
-		for (iterator it = begin () + index; it != end (); it++)
-			(*it) = val;
+		for (iterator it = position; it != position + n; it++)
+			*it = val;
 	}
 
 	template<class T, class TAllocator>
 	template<class TInput_Iterator>
 	void vector<T, TAllocator>::insert (typename vector<T, TAllocator>::iterator position, TInput_Iterator first, TInput_Iterator last, typename enable_if<!is_integral<TInput_Iterator>::value>::type *enabled)
 	{
-		size_type pos_index = position - begin ();
+		(void)enabled;
+		if (last <= first)
+			return;
+
+		size_type index = position - begin ();
 		size_type n = last - first;
 		
 		if (m_size + n > m_capacity)
 			reserve (m_capacity * 2 + n);
 
-		for (size_type i = 0; i < n; i += 1)
-			m_data[pos_index + n + i] = m_data[pos_index + i];
+		position = begin () + index;
+
+		for (iterator it = end () + n - 1; it != position + n - 1; it--)
+			*it = *(it - n);
 
 		m_size += n;
 
-		size_type i = 0;
+		size_type i = index;
 		for (TInput_Iterator it = first; it != last; it++)
 		{
 			m_data[i] = *it;

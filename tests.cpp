@@ -112,16 +112,22 @@ int test_vector ()
 	
 	vec.erase (vec.begin ());
 	PRINT (vec.begin (), vec.end ());
-	
+
+	vec.insert (vec.end (), 123);
+	PRINT (vec.begin (), vec.end ());
+
 	vec.insert (vec.begin () + 3, 69105);
 	PRINT (vec.begin (), vec.end ());
 
-	vec.insert (vec.begin () + 3, 4, 0xb00b);
+	vec.insert (vec.begin () + 3, 4, 42);
 	PRINT (vec.begin (), vec.end ());
 
 	vec.erase (vec.begin () + 10, vec.begin () + 15);
 	PRINT (vec.begin (), vec.end ());
 	
+	vec.insert (vec.begin (), vec1.begin () + 100, vec1.end () - 100);
+	PRINT (vec.begin (), vec.end ());
+
 	vec.swap (vec1);
 	PRINT (vec.begin (), vec.end ());
 	
