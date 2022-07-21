@@ -1,5 +1,7 @@
 *.o
 *.out
 *.a
+ft
+std
 .vscode/
 obj/
