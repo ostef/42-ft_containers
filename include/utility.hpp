@@ -49,7 +49,7 @@ namespace ft
 	template<class T1, class T2>
 	pair<T1, T2> make_pair (T1 first, T2 second)
 	{
-		return pair (first, second);
+		return pair<T1, T2> (first, second);
 	}
 
 	template<class T1, class T2>
