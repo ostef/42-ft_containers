@@ -6,12 +6,19 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/03 14:27:47 by soumanso          #+#    #+#             */
-/*   Updated: 2022/07/21 14:50:23 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/10/21 16:46:32 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FT_UTILITY_HPP
 #define FT_UTILITY_HPP
+
+#include <cstdlib>
+#include <iostream>
+
+#ifndef ASSERT
+# define ASSERT(x) { if (!(x)) { std::cerr << "Assertion failed: " << #x << std::endl; abort (); } }
+#endif
 
 namespace ft
 {
