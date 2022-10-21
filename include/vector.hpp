@@ -6,13 +6,14 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 20:23:47 by soumanso          #+#    #+#             */
-/*   Updated: 2022/07/21 15:48:05 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/07/21 15:54:13 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FT_VECTOR_HPP
 #define FT_VECTOR_HPP
 
+#include <memory>
 #include <stdexcept>
 #include <stddef.h>
 #include <limits>
