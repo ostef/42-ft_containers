@@ -113,7 +113,8 @@ int test_vector ()
 	vec.erase (vec.begin ());
 	PRINT (vec.begin (), vec.end ());
 
-	vec.insert (vec.end (), 123);
+	ft::vector<elem_type>::iterator it = vec.insert (vec.end (), 123);
+	std::cout << (size_t)(it - vec.begin ()) << std::endl;
 	PRINT (vec.begin (), vec.end ());
 
 	vec.insert (vec.begin () + 3, 69105);
@@ -126,6 +127,9 @@ int test_vector ()
 	PRINT (vec.begin (), vec.end ());
 	
 	vec.insert (vec.begin (), vec1.begin () + 100, vec1.end () - 100);
+	PRINT (vec.begin (), vec.end ());
+
+	vec.erase (vec.end () - 1);
 	PRINT (vec.begin (), vec.end ());
 
 	vec.swap (vec1);
@@ -145,6 +149,77 @@ int test_vector ()
 	return ko;
 }
 
+template<typename T>
+bool ensure_sorted (T &rbt)
+{
+	int prev = (int)0xffffffff;
+	for (typename T::iterator it = rbt.begin (); it != rbt.end (); it++)
+	{
+		if (*it < prev)
+			return false;
+		prev = *it;
+	}
+
+	return true;
+}
+
+#ifndef STD_TEST
+template<typename T>
+bool ensure_no_loop_in_rbt (ft::rbt<T> &rbt)
+{
+	typedef typename ft::rbt<T>::iterator It;
+	typedef ft::vector<It> VecIt;
+
+	VecIt visited_nodes;
+
+	for (It it = rbt.begin (); it != rbt.end (); it++)
+	{
+		for (typename VecIt::iterator it2 = visited_nodes.begin (); it2 != visited_nodes.end (); it2++)
+		{
+			if (it == *it2)
+				return false;
+		}
+		visited_nodes.push_back (it);
+	}
+
+	return true;
+}
+#endif
+
+int test_rbt ()
+{
+	int ko = 0;
+
+#ifndef STD_TEST
+
+	ft::rbt<int> rbt = ft::rbt<int> ();
+	rbt.insert (10);
+	rbt.insert (12);
+	rbt.insert (9);
+	rbt.insert (11);
+
+	PRINT (rbt.begin (), rbt.end ());
+	EXPECT (ensure_sorted (rbt));
+
+	{
+		ft::rbt<int>::iterator it = rbt.end ();
+		--it;
+		++it;
+		EXPECT (it == rbt.end ());
+	}
+
+	for (int i = 0; i < 1000; i += 1)
+	{
+		rbt.insert (rand ());
+		//EXPECT (ensure_no_loop_in_rbt (rbt));
+	}
+
+	EXPECT (ensure_sorted (rbt));
+#endif
+
+	return ko;
+}
+
 int main ()
 {
 	int ko = 0;
@@ -152,7 +227,9 @@ int main ()
 	ko += test_is_integral ();
 	std::cout << "========= vector =========" << std::endl;
 	ko += test_vector ();
+	std::cout << "========= rbt =========" << std::endl;
+	ko += test_rbt ();
 	std::cout << ko << " KOs total." << std::endl;
 
-	return ko;
+	return 0;
 }
