@@ -6,7 +6,7 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 20:23:47 by soumanso          #+#    #+#             */
-/*   Updated: 2022/07/21 15:54:13 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/10/21 23:47:51 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,20 +128,20 @@ namespace ft
 		allocator_type get_allocator () const;
 
 	private:
-		value_type *m_data;
-		size_type m_size;
-		size_type m_capacity;
-		allocator_type m_alloc;
+		value_type *_data;
+		size_type _size;
+		size_type _capacity;
+		allocator_type _alloc;
 	};
 
 // Constructors, destructor
 
 	template<class T, class TAllocator>
 	vector<T, TAllocator>::vector (const allocator_type &alloc) :
-		m_data (NULL),
-		m_size (0),
-		m_capacity (0),
-		m_alloc (alloc)
+		_data (NULL),
+		_size (0),
+		_capacity (0),
+		_alloc (alloc)
 	{}
 
 	template<class T, class TAllocator>
@@ -150,10 +150,10 @@ namespace ft
 		const value_type &val,
 		const allocator_type &alloc
 	) :
-		m_data (NULL),
-		m_size (0),
-		m_capacity (0),
-		m_alloc (alloc)
+		_data (NULL),
+		_size (0),
+		_capacity (0),
+		_alloc (alloc)
 	{
 		insert (begin (), n, val);
 	}
@@ -165,10 +165,10 @@ namespace ft
 		TInput_Iterator last,
 		const allocator_type &alloc
 	) :
-		m_data (NULL),
-		m_size (0),
-		m_capacity (0),
-		m_alloc (alloc)
+		_data (NULL),
+		_size (0),
+		_capacity (0),
+		_alloc (alloc)
 	{
 		insert (begin (), first, last);
 	}
@@ -176,20 +176,20 @@ namespace ft
 	template<class T, class TAllocator>
 	vector<T, TAllocator>::vector (const this_type &other)
 	{
-		m_alloc = other.get_allocator ();
-		m_data = m_alloc.allocate (other.capacity ());
-		m_capacity = other.capacity ();
-		m_size = 0;
+		_alloc = other.get_allocator ();
+		_data = _alloc.allocate (other.capacity ());
+		_capacity = other.capacity ();
+		_size = 0;
 		assign (other.begin (), other.end ());
 	}
 
 	template<class T, class TAllocator>
 	vector<T, TAllocator>::~vector ()
 	{
-		m_alloc.deallocate (m_data, m_capacity);
-		m_data = NULL;
-		m_size = 0;
-		m_capacity = 0;
+		_alloc.deallocate (_data, _capacity);
+		_data = NULL;
+		_size = 0;
+		_capacity = 0;
 	}
 
 // Operators
@@ -203,13 +203,13 @@ namespace ft
 	template<class T, class TAllocator>
 	typename vector<T, TAllocator>::reference vector<T, TAllocator>::operator[] (size_type n)
 	{
-		return m_data[n];
+		return _data[n];
 	}
 
 	template<class T, class TAllocator>
 	typename vector<T, TAllocator>::const_reference vector<T, TAllocator>::operator[] (size_type n) const
 	{
-		return m_data[n];
+		return _data[n];
 	}
 
 // Actual functionality
@@ -237,68 +237,68 @@ namespace ft
 	template<class T, class TAllocator>
 	void vector<T, TAllocator>::swap (vector<T, TAllocator> &other)
 	{
-		value_type     *tmp_data     = m_data;
-		size_type      tmp_size     = m_size;
-		size_type      tmp_capacity = m_capacity;
-		allocator_type tmp_alloc    = m_alloc;
+		value_type     *tmp_data     = _data;
+		size_type      tmp_size     = _size;
+		size_type      tmp_capacity = _capacity;
+		allocator_type tmp_alloc    = _alloc;
 
-		m_data     = other.m_data;
-		m_size     = other.m_size;
-		m_capacity = other.m_capacity;
-		m_alloc    = other.m_alloc;
+		_data     = other._data;
+		_size     = other._size;
+		_capacity = other._capacity;
+		_alloc    = other._alloc;
 
-		other.m_data     = tmp_data;
-		other.m_size     = tmp_size;
-		other.m_capacity = tmp_capacity;
-		other.m_alloc    = tmp_alloc;
+		other._data     = tmp_data;
+		other._size     = tmp_size;
+		other._capacity = tmp_capacity;
+		other._alloc    = tmp_alloc;
 	}
 
 	template<class T, class TAllocator>
 	void vector<T, TAllocator>::reserve (vector<T, TAllocator>::size_type n)
 	{
-		if (n <= m_capacity)
+		if (n <= _capacity)
 			return;
-		value_type *new_data = m_alloc.allocate (n);
-		for (size_type i = 0; i < m_size; i += 1)
+		value_type *new_data = _alloc.allocate (n);
+		for (size_type i = 0; i < _size; i += 1)
 		{
-			m_alloc.construct (new_data + i, m_data[i]);
-			m_alloc.destroy (m_data + i);
+			_alloc.construct (new_data + i, _data[i]);
+			_alloc.destroy (_data + i);
 		}
-		m_alloc.deallocate (m_data, m_capacity);
-		m_capacity = n;
-		m_data = new_data;
+		_alloc.deallocate (_data, _capacity);
+		_capacity = n;
+		_data = new_data;
 	}
 
 	template<class T, class TAllocator>
 	void vector<T, TAllocator>::resize (vector<T, TAllocator>::size_type n, vector<T, TAllocator>::value_type val)
 	{
-		while (m_size > n)
+		while (_size > n)
 			pop_back ();
-		while (m_size < n)
+		while (_size < n)
 			push_back (val);
 	}
 
 	template<class T, class TAllocator>
 	void vector<T, TAllocator>::clear ()
 	{
-		while (m_size > 0)
+		while (_size > 0)
 			pop_back ();
 	}
 	
 	template<class T, class TAllocator>
 	void vector<T, TAllocator>::push_back (const vector<T, TAllocator>::value_type &val)
 	{
-		if (m_size >= m_capacity)
-			reserve (m_capacity * 2 + 8);
-		m_alloc.construct (end (), val);
-		m_size += 1;
+		if (_size >= _capacity)
+			reserve (_capacity * 2 + 8);
+		_alloc.construct (end (), val);
+		_size += 1;
 	}
 
 	template<class T, class TAllocator>
 	void vector<T, TAllocator>::pop_back ()
 	{
-		m_alloc.destroy (end () - 1);
-		m_size -= 1;
+		_alloc.destroy (end () - 1);
+		_size -= 1;
 	}
 
 	template<class T, class TAllocator>
@@ -318,15 +318,15 @@ namespace ft
 
 		size_type index = position - begin ();
 		
-		if (m_size + n > m_capacity)
-			reserve (m_capacity * 2 + n);
+		if (_size + n > _capacity)
+			reserve (_capacity * 2 + n);
 		
 		position = begin () + index;
 
 		for (iterator it = end () + n - 1; it != position + n - 1; it--)
 			*it = *(it - n);
 
-		m_size += n;
+		_size += n;
 
 		for (iterator it = position; it != position + n; it++)
 			*it = val;
@@ -343,20 +343,20 @@ namespace ft
 		size_type index = position - begin ();
 		size_type n = last - first;
 		
-		if (m_size + n > m_capacity)
-			reserve (m_capacity * 2 + n);
+		if (_size + n > _capacity)
+			reserve (_capacity * 2 + n);
 
 		position = begin () + index;
 
 		for (iterator it = end () + n - 1; it != position + n - 1; it--)
 			*it = *(it - n);
 
-		m_size += n;
+		_size += n;
 
 		size_type i = index;
 		for (TInput_Iterator it = first; it != last; it++)
 		{
-			m_data[i] = *it;
+			_data[i] = *it;
 			i += 1;
 		}
 	}
@@ -377,13 +377,13 @@ namespace ft
 		size_type last_index = last - begin ();
 		size_type n = last - first;
 
-		for (size_type i = first_index; i + n < m_size; i += 1)
-			m_data[i] = m_data[i + n];
+		for (size_type i = first_index; i + n < _size; i += 1)
+			_data[i] = _data[i + n];
 
 		for (size_type i = 0; i < n; i += 1)
 			pop_back ();
 
-		if (last_index >= m_size)
+		if (last_index >= _size)
 			return end ();
 		
 		return last;
@@ -394,73 +394,73 @@ namespace ft
 	template<class T, class TAllocator>
 	typename vector<T, TAllocator>::reference vector<T, TAllocator>::at (vector<T, TAllocator>::size_type n)
 	{
-		if (n >= m_size)
+		if (n >= _size)
 			throw std::out_of_range ("Bounds check failure in vector.");
-		return m_data[n];
+		return _data[n];
 	}
 
 	template<class T, class TAllocator>
 	typename vector<T, TAllocator>::const_reference vector<T, TAllocator>::at (vector<T, TAllocator>::size_type n) const
 	{
-		if (n >= m_size)
+		if (n >= _size)
 			throw std::out_of_range ("Bounds check failure in vector.");
-		return m_data[n];
+		return _data[n];
 	}
 
 	template<class T, class TAllocator>
 	typename vector<T, TAllocator>::reference vector<T, TAllocator>::back ()
 	{
-		if (m_size == 0)
+		if (_size == 0)
 			throw std::out_of_range ("Vector is empty.");
-		return m_data[m_size - 1];
+		return _data[_size - 1];
 	}
 
 	template<class T, class TAllocator>
 	typename vector<T, TAllocator>::const_reference vector<T, TAllocator>::back () const
 	{
-		if (m_size == 0)
+		if (_size == 0)
 			throw std::out_of_range ("Vector is empty.");
-		return m_data[m_size - 1];
+		return _data[_size - 1];
 	}
 
 	template<class T, class TAllocator>
 	typename vector<T, TAllocator>::reference vector<T, TAllocator>::front ()
 	{
-		if (m_size == 0)
+		if (_size == 0)
 			throw std::out_of_range ("Vector is empty.");
-		return m_data[0];
+		return _data[0];
 	}
 	
 	template<class T, class TAllocator>
 	typename vector<T, TAllocator>::const_reference vector<T, TAllocator>::front () const
 	{
-		if (m_size == 0)
+		if (_size == 0)
 			throw std::out_of_range ("Vector is empty.");
-		return m_data[0];
+		return _data[0];
 	}
 
 	template<class T, class TAllocator>
 	typename vector<T, TAllocator>::iterator vector<T, TAllocator>::begin ()
 	{
-		return m_data;
+		return _data;
 	}
 
 	template<class T, class TAllocator>
 	typename vector<T, TAllocator>::const_iterator vector<T, TAllocator>::begin () const
 	{
-		return m_data;
+		return _data;
 	}
 
 	template<class T, class TAllocator>
 	typename vector<T, TAllocator>::iterator vector<T, TAllocator>::end ()
 	{
-		return m_data + m_size;
+		return _data + _size;
 	}
 
 	template<class T, class TAllocator>
 	typename vector<T, TAllocator>::const_iterator vector<T, TAllocator>::end () const
 	{
-		return m_data + m_size;
+		return _data + _size;
 	}
 
 	template<class T, class TAllocator>
@@ -490,31 +490,31 @@ namespace ft
 	template<class T, class TAllocator>
 	bool vector<T, TAllocator>::empty () const
 	{
-		return m_size == 0;
+		return _size == 0;
 	}
 
 	template<class T, class TAllocator>
 	typename vector<T, TAllocator>::value_type *vector<T, TAllocator>::data () noexcept
 	{
-		return m_data;
+		return _data;
 	}
 
 	template<class T, class TAllocator>
 	const typename vector<T, TAllocator>::value_type *vector<T, TAllocator>::data () const noexcept
 	{
-		return m_data;
+		return _data;
 	}
 
 	template<class T, class TAllocator>
 	typename vector<T, TAllocator>::size_type vector<T, TAllocator>::capacity () const
 	{
-		return m_capacity;
+		return _capacity;
 	}
 
 	template<class T, class TAllocator>
 	typename vector<T, TAllocator>::size_type vector<T, TAllocator>::size () const
 	{
-		return m_size;
+		return _size;
 	}
 
 	template<class T, class TAllocator>
@@ -526,7 +526,7 @@ namespace ft
 	template<class T, class TAllocator>
 	typename vector<T, TAllocator>::allocator_type vector<T, TAllocator>::get_allocator () const
 	{
-		return m_alloc;
+		return _alloc;
 	}
 }
 

@@ -136,20 +136,20 @@ namespace ft
 			typedef rbt<T, Compare, Allocator> container_type;
 
 		public:
-			iterator () : m_tree (NULL), m_node ((node_type *)RBT_NODE_END) {}
-			iterator (const iterator &other) : m_tree (other.m_tree), m_node (other.m_node) {}
-			iterator (container_type *tree, node_type *node) : m_tree (tree), m_node (node) {}
+			iterator () : _tree (NULL), _node ((node_type *)RBT_NODE_END) {}
+			iterator (const iterator &other) : _tree (other._tree), _node (other._node) {}
+			iterator (container_type *tree, node_type *node) : _tree (tree), _node (node) {}
 
 			iterator &operator= (const iterator &other)
 			{
-				m_tree = other.m_tree;
-				m_node = other.m_node;
+				_tree = other._tree;
+				_node = other._node;
 				return *this;
 			}
 
 			bool operator== (const iterator &other)
 			{
-				return m_tree == other.m_tree && m_node == other.m_node;
+				return _tree == other._tree && _node == other._node;
 			}
 
 			bool operator!= (const iterator &other)
@@ -157,8 +157,8 @@ namespace ft
 				return !(*this == other);
 			}
 
-			value_type &operator* () { return m_node->value; }
-			value_type *operator-> () { return *m_node->value; }
+			value_type &operator* () { return _node->value; }
+			value_type *operator-> () { return *_node->value; }
 
 			iterator &operator++ ()
 			{
@@ -188,61 +188,61 @@ namespace ft
 
 			node_type *node ()
 			{
-				return m_node;
+				return _node;
 			}
 
 		private:
 
 			iterator next ()
 			{
-				if (m_node == (node_type *)RBT_NODE_BEGIN)
+				if (_node == (node_type *)RBT_NODE_BEGIN)
 				{
-					node_type *node = m_tree->m_root->leftmost ();
+					node_type *node = _tree->_root->leftmost ();
 					if (!node)
 						node = (node_type *)RBT_NODE_END;
 
-					return iterator (m_tree, node);
+					return iterator (_tree, node);
 				}
-				else if (m_node == (node_type *)RBT_NODE_END)
+				else if (_node == (node_type *)RBT_NODE_END)
 					return iterator (*this);
 
-				node_type *node = m_node->successor ();
+				node_type *node = _node->successor ();
 				if (!node)
 					node = (node_type *)RBT_NODE_END;
 
-				return iterator (m_tree, node);
+				return iterator (_tree, node);
 			}
 
 			iterator prev ()
 			{
-				if (m_node == (node_type *)RBT_NODE_END)
+				if (_node == (node_type *)RBT_NODE_END)
 				{
-					node_type *node = m_tree->m_root->rightmost ();
+					node_type *node = _tree->_root->rightmost ();
 					if (!node)
 						node = (node_type *)RBT_NODE_BEGIN;
 
-					return iterator (m_tree, node);
+					return iterator (_tree, node);
 				}
-				else if (m_node == (node_type *)RBT_NODE_BEGIN)
+				else if (_node == (node_type *)RBT_NODE_BEGIN)
 					return iterator (*this);
 
-				node_type *node = m_node->predecessor ();
+				node_type *node = _node->predecessor ();
 				if (!node)
-					return iterator (m_tree, (node_type *)RBT_NODE_BEGIN);
+					return iterator (_tree, (node_type *)RBT_NODE_BEGIN);
 
-				return iterator (m_tree, node);
+				return iterator (_tree, node);
 			}
 
 		private:
-			container_type *m_tree;
-			node_type *m_node;
+			container_type *_tree;
+			node_type *_node;
 		};
 
 		friend class iterator;
 
 	public:
 		explicit rbt (const allocator_type &alloc = allocator_type ()) :
-			m_root (NULL), m_less_than (), m_alloc (alloc) {}
+			_root (NULL), _less_than (), _alloc (alloc) {}
 
 		~rbt ()
 		{
@@ -251,15 +251,15 @@ namespace ft
 
 		void insert (const value_type &val)
 		{
-			node_type *node = m_alloc.allocate (sizeof (node_type));
-			m_alloc.construct (node, val);
+			node_type *node = _alloc.allocate (sizeof (node_type));
+			_alloc.construct (node, val);
 			insert (node);
 		}
 
 		iterator begin ()
 		{
 			// @Todo: Make this O(1)
-			node_type *node = m_root;
+			node_type *node = _root;
 			while (node && node->left)
 				node = node->left;
 	
@@ -293,8 +293,8 @@ namespace ft
 			y->parent = x->parent;
 			
 			// Update the root
-			if (m_root == x)
-				m_root = y;
+			if (_root == x)
+				_root = y;
 			else if (x == x->parent->left)
 				x->parent->left = y;
 			else
@@ -318,8 +318,8 @@ namespace ft
 			y->parent = x->parent;
 			
 			// Update the root
-			if (m_root == x)
-				m_root = y;
+			if (_root == x)
+				_root = y;
 			else if (x == x->parent->right)
 				x->parent->right = y;
 			else
@@ -332,9 +332,9 @@ namespace ft
 
 		void bst_insert (node_type *node)
 		{
-			if (!m_root)
+			if (!_root)
 			{
-				m_root = node;
+				_root = node;
 				node->parent = NULL;
 				node->left = NULL;
 				node->right = NULL;
@@ -342,20 +342,20 @@ namespace ft
 				return;
 			}
 
-			node_type *curr = m_root;
+			node_type *curr = _root;
 			node_type *parent = NULL;
 			
 			while (curr)
 			{
 				parent = curr;
-				if (m_less_than (node->value, curr->value))
+				if (_less_than (node->value, curr->value))
 					curr = curr->left;
 				else
 					curr = curr->right;
 			}
 
 			
-			if (m_less_than (node->value, parent->value))
+			if (_less_than (node->value, parent->value))
 			{
 				ASSERT (parent->left == NULL);
 				parent->left = node;
@@ -373,7 +373,7 @@ namespace ft
 
 		void insert_fixup (node_type *node)
 		{
-			while (node != m_root && !node->is_black && !node->parent->is_black)
+			while (node != _root && !node->is_black && !node->parent->is_black)
 			{
 				node_type *parent = node->parent;
 				node_type *grand_parent = parent->parent;
@@ -412,7 +412,7 @@ namespace ft
 				{
 					node_type *uncle = grand_parent->left;
 
-					// Case 1" uncle is red, recolor
+					// Case 1: uncle is red, recolor
 					if (uncle && !uncle->is_black)
 					{
 						grand_parent->is_black = false;
@@ -440,16 +440,16 @@ namespace ft
 				}
 			}
 
-			m_root->is_black = true;
+			_root->is_black = true;
 		}
 
-		void bst_remove (node_type *node)
+		void bst_erase (node_type *node)
 		{
 			// Simple case: leaf node
 			if (!node->left && !node->right)
 			{
 				if (!node->parent)
-					m_root = NULL;
+					_root = NULL;
 				else if (node->parent->left == node)
 					node->parent->left = NULL;
 				else
@@ -460,7 +460,7 @@ namespace ft
 				node_type *child = node->right ? node->right : node->left;
 			
 				if (!node->parent)
-					m_root = child;
+					_root = child;
 				else if (node->parent->left == node)
 					node->parent->left = child;
 				else
@@ -475,12 +475,13 @@ namespace ft
 				while (successor->left)
 					successor = successor->left;
 
-				// @Note: this isn't recursive, since the successor only has at most one child
+				// This recursion is only one level deep, since
+				// the successor has at most one child
 				if (successor != node->right)
-					bst_remove (successor);
+					bst_erase (successor);
 
 				if (!node->parent)
-					m_root = successor;
+					_root = successor;
 				else if (node->parent->left == node)
 					node->parent->left = successor;
 				else
@@ -500,12 +501,12 @@ namespace ft
 
 		node_type *search (const value_type &value)
 		{
-			node_type *node = m_root;
+			node_type *node = _root;
 			while (node)
 			{
 				if (node->value == value)
 					break;
-				else if (m_less_than (value, node->value))
+				else if (_less_than (value, node->value))
 					node = node->left;
 				else
 					node = node->right;
@@ -515,9 +516,9 @@ namespace ft
 		}
 
 	private:
-		node_type *m_root;
-		value_compare m_less_than;
-		allocator_type m_alloc;
+		node_type *_root;
+		value_compare _less_than;
+		allocator_type _alloc;
 	};
 }
 

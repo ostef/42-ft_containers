@@ -6,7 +6,7 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/03 13:08:55 by soumanso          #+#    #+#             */
-/*   Updated: 2022/07/21 14:50:11 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/10/21 23:47:51 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,89 +82,89 @@ namespace ft
 
 	public:
 		reverse_iterator ()
-			: m_base () {}
+			: _base () {}
 		explicit reverse_iterator (iterator_type it)
-			: m_base (it) {}
+			: _base (it) {}
 		template<class TOther_Iter>
 		reverse_iterator (const reverse_iterator<TOther_Iter> &other)
-			: m_base (other.base ()) {}
+			: _base (other.base ()) {}
 
 		template<class TOther_Iter>
 		reverse_iterator &operator= (const reverse_iterator<TOther_Iter> &other)
 		{
-			m_base = other.base ();
+			_base = other.base ();
 			return *this;
 		}
 
-		iterator_type base () const { return m_base; }
+		iterator_type base () const { return _base; }
 
 		reference operator* () const
 		{
-			iterator_type it = m_base;
+			iterator_type it = _base;
 			return *(--it);
 		}
 		
 		pointer operator-> () const
 		{
-			iterator_type it = m_base;
+			iterator_type it = _base;
 			return (--it).operator-> ();
 		}
 
 		reference operator[] (difference_type n) const
 		{
-			return m_base[-n - 1];
+			return _base[-n - 1];
 		}
 
 		reverse_iterator operator+ (difference_type n) const
 		{
-			return reverse_iterator (m_base - n);
+			return reverse_iterator (_base - n);
 		}
 		
 		reverse_iterator &operator++ ()
 		{
-			--m_base;
+			--_base;
 			return *this;
 		}
 		
 		reverse_iterator operator++ (int)
 		{
 			reverse_iterator tmp = *this;
-			--m_base;
+			--_base;
 			return tmp;
 		}
 		
 		reverse_iterator &operator+= (difference_type n)
 		{
-			m_base -= n;
+			_base -= n;
 			return *this;
 		}
 
 		reverse_iterator operator- (difference_type n) const
 		{
-			return reverse_iterator (m_base + n);
+			return reverse_iterator (_base + n);
 		}
 
 		reverse_iterator &operator-- ()
 		{
-			++m_base;
+			++_base;
 			return *this;
 		}
 
 		reverse_iterator operator-- (int)
 		{
 			reverse_iterator tmp = *this;
-			++m_base;
+			++_base;
 			return tmp;
 		}
 
 		reverse_iterator &operator-= (difference_type n)
 		{
-			m_base += n;
+			_base += n;
 			return *this;
 		}
 
 	private:
-		iterator_type m_base;
+		iterator_type _base;
 	};
 
 	template<class TIter_L, class TIter_R>
