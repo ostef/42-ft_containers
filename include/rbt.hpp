@@ -47,6 +47,7 @@ namespace ft
 			left = other.left;
 			right = other.right;
 			value = other.value;
+
 			return *this;
 		}
 
@@ -60,22 +61,32 @@ namespace ft
 			return parent && parent->right == this;
 		}
 	
-		this_type *leftmost ()
+		const this_type *leftmost () const
 		{
-			this_type *node = this;
+			const this_type *node = this;
 			while (node && node->left)
 				node = node->left;
 
 			return node;
 		}
 
-		this_type *rightmost ()
+		this_type *leftmost ()
 		{
-			this_type *node = this;
+			return const_cast<this_type *> (const_cast<const this_type *> (this)->leftmost ());
+		}
+
+		const this_type *rightmost () const
+		{
+			const this_type *node = this;
 			while (node && node->right)
 				node = node->right;
 
 			return node;
+		}
+
+		this_type *rightmost ()
+		{
+			return const_cast<this_type *> (const_cast<const this_type *> (this)->rightmost ());
 		}
 
 		// First rule: The first node in the tree is the leftmost node in the tree.
@@ -85,13 +96,33 @@ namespace ft
 		//      - If you make a right turn (i.e. this node was a left child), then that parent node is the successor
 		//      - If you make a left turn (i.e. this node was a right child), continue going up.
 		//      - If you can't go up anymore, then there's no successor
-		this_type *successor ()
+		const this_type *successor () const
 		{
 			if (right)
 				return right->leftmost ();
 
-			this_type *node = this;
+			const this_type *node = this;
 			while (node && node->parent && node->is_right_child ())
+				node = node->parent;
+
+			if (!node)
+				return NULL;
+			
+			return node->parent;
+		}
+
+		this_type *successor ()
+		{
+			return const_cast<this_type *> (const_cast<const this_type *> (this)->successor ());
+		}
+
+		const this_type *predecessor () const
+		{
+			if (left)
+				return left->rightmost ();
+			
+			const this_type *node = this;
+			while (node && node->parent && node->is_left_child ())
 				node = node->parent;
 
 			if (!node)
@@ -102,17 +133,131 @@ namespace ft
 
 		this_type *predecessor ()
 		{
-			if (left)
-				return left->rightmost ();
-			
-			this_type *node = this;
-			while (node && node->parent && node->is_left_child ())
-				node = node->parent;
+			return const_cast<this_type *> (const_cast<const this_type *> (this)->predecessor ());
+		}
+	};
 
-			if (!node)
-				return NULL;
+	template<typename T>
+	struct traits
+	{
+		typedef typename T::value_type value_type;
+	};
+
+	template<typename T>
+	struct traits<const T>
+	{
+		typedef const typename T::value_type value_type;
+	};
+
+	template<typename Container, typename Node>
+	class bst_iterator
+	{
+	public:
+		typedef Container container_type;
+		typedef Node node_type;
+		typedef typename traits<node_type>::value_type value_type;
+
+	private:
+		container_type *_tree;
+		node_type *_node;
+
+	public:
+		bst_iterator () : _tree (NULL), _node ((node_type *)RBT_NODE_END) {}
+		bst_iterator (const bst_iterator &other) : _tree (other._tree), _node (other._node) {}
+		bst_iterator (container_type *tree, node_type *node) : _tree (tree), _node (node) {}
+
+		bst_iterator &operator= (const bst_iterator &other)
+		{
+			_tree = other._tree;
+			_node = other._node;
 			
-			return node->parent;
+			return *this;
+		}
+
+		bool operator== (const bst_iterator &other)
+		{
+			return _tree == other._tree && _node == other._node;
+		}
+
+		bool operator!= (const bst_iterator &other)
+		{
+			return !(*this == other);
+		}
+
+		value_type &operator* () { return _node->value; }
+		value_type *operator-> () { return *_node->value; }
+
+		bst_iterator &operator++ ()
+		{
+			*this = next ();
+			return *this;
+		}
+
+		bst_iterator operator++ (int)
+		{
+			bst_iterator tmp = *this;
+			*this = next ();
+			return tmp;
+		}
+
+		bst_iterator &operator-- ()
+		{
+			*this = prev ();
+			return *this;
+		}
+
+		bst_iterator operator-- (int)
+		{
+			bst_iterator tmp = *this;
+			*this = prev ();
+			return tmp;
+		}
+
+		node_type *node ()
+		{
+			return _node;
+		}
+
+	private:
+
+		bst_iterator next ()
+		{
+			if (_node == (node_type *)RBT_NODE_BEGIN)
+			{
+				node_type *node = _tree->root ()->leftmost ();
+				if (!node)
+					node = (node_type *)RBT_NODE_END;
+
+				return bst_iterator (_tree, node);
+			}
+			else if (_node == (node_type *)RBT_NODE_END)
+				return bst_iterator (*this);
+
+			node_type *node = _node->successor ();
+			if (!node)
+				node = (node_type *)RBT_NODE_END;
+
+			return bst_iterator (_tree, node);
+		}
+
+		bst_iterator prev ()
+		{
+			if (_node == (node_type *)RBT_NODE_END)
+			{
+				node_type *node = _tree->root ()->rightmost ();
+				if (!node)
+					node = (node_type *)RBT_NODE_BEGIN;
+
+				return bst_iterator (_tree, node);
+			}
+			else if (_node == (node_type *)RBT_NODE_BEGIN)
+				return bst_iterator (*this);
+
+			node_type *node = _node->predecessor ();
+			if (!node)
+				return bst_iterator (_tree, (node_type *)RBT_NODE_BEGIN);
+
+			return bst_iterator (_tree, node);
 		}
 	};
 
@@ -124,121 +269,23 @@ namespace ft
 	class rbt
 	{
 	public:
-		typedef rbt<T, Allocator> this_type;
-		typedef T                 value_type;
-		typedef rbt_node<T>       node_type;
-		typedef Compare           value_compare;
-		typedef Allocator         allocator_type;
+		typedef rbt<T, Compare, Allocator> this_type;
+		typedef T value_type;
+		typedef size_t size_type;
+		typedef rbt_node<T> node_type;
+		typedef Compare value_compare;
+		typedef Allocator allocator_type;
 
-		class iterator
-		{
-		public:
-			typedef rbt<T, Compare, Allocator> container_type;
+		typedef bst_iterator<this_type, node_type> iterator;
+		typedef bst_iterator<const this_type, const node_type> const_iterator;
+		typedef ft::reverse_iterator<iterator> reverse_iterator;
+		typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
 
-		public:
-			iterator () : _tree (NULL), _node ((node_type *)RBT_NODE_END) {}
-			iterator (const iterator &other) : _tree (other._tree), _node (other._node) {}
-			iterator (container_type *tree, node_type *node) : _tree (tree), _node (node) {}
-
-			iterator &operator= (const iterator &other)
-			{
-				_tree = other._tree;
-				_node = other._node;
-				return *this;
-			}
-
-			bool operator== (const iterator &other)
-			{
-				return _tree == other._tree && _node == other._node;
-			}
-
-			bool operator!= (const iterator &other)
-			{
-				return !(*this == other);
-			}
-
-			value_type &operator* () { return _node->value; }
-			value_type *operator-> () { return *_node->value; }
-
-			iterator &operator++ ()
-			{
-				*this = next ();
-				return *this;
-			}
-
-			iterator operator++ (int)
-			{
-				iterator tmp = *this;
-				*this = next ();
-				return tmp;
-			}
-
-			iterator &operator-- ()
-			{
-				*this = prev ();
-				return *this;
-			}
-
-			iterator operator-- (int)
-			{
-				iterator tmp = *this;
-				*this = prev ();
-				return tmp;
-			}
-
-			node_type *node ()
-			{
-				return _node;
-			}
-
-		private:
-
-			iterator next ()
-			{
-				if (_node == (node_type *)RBT_NODE_BEGIN)
-				{
-					node_type *node = _tree->_root->leftmost ();
-					if (!node)
-						node = (node_type *)RBT_NODE_END;
-
-					return iterator (_tree, node);
-				}
-				else if (_node == (node_type *)RBT_NODE_END)
-					return iterator (*this);
-
-				node_type *node = _node->successor ();
-				if (!node)
-					node = (node_type *)RBT_NODE_END;
-
-				return iterator (_tree, node);
-			}
-
-			iterator prev ()
-			{
-				if (_node == (node_type *)RBT_NODE_END)
-				{
-					node_type *node = _tree->_root->rightmost ();
-					if (!node)
-						node = (node_type *)RBT_NODE_BEGIN;
-
-					return iterator (_tree, node);
-				}
-				else if (_node == (node_type *)RBT_NODE_BEGIN)
-					return iterator (*this);
-
-				node_type *node = _node->predecessor ();
-				if (!node)
-					return iterator (_tree, (node_type *)RBT_NODE_BEGIN);
-
-				return iterator (_tree, node);
-			}
-
-		private:
-			container_type *_tree;
-			node_type *_node;
-		};
-
-		friend class iterator;
+	private:
+		node_type *_root;
+		size_type _size;
+		value_compare _less_than;
+		allocator_type _alloc;
 
 	public:
 		explicit rbt (const allocator_type &alloc = allocator_type ()) :
@@ -249,26 +296,108 @@ namespace ft
 			// @Todo
 		}
 
+		node_type *root ()
+		{
+			return _root;
+		}
+
+		const node_type *root () const
+		{
+			return _root;
+		}
+
 		void insert (const value_type &val)
 		{
 			node_type *node = _alloc.allocate (sizeof (node_type));
 			_alloc.construct (node, val);
 			insert (node);
+			_size += 1;
+		}
+
+		iterator erase(iterator it)
+		{
+			// @Todo
+			return it;
+		}
+
+		iterator search (const value_type &value)
+		{
+			node_type *node = _root;
+			while (node)
+			{
+				if (node->value == value)
+					break;
+				else if (_less_than (value, node->value))
+					node = node->left;
+				else
+					node = node->right;
+			}
+
+			return iterator (this, node);
+		}
+
+		allocator_type get_allocator () const
+		{
+			return _alloc;
+		}
+
+		bool empty () const
+		{
+			return !_root;
+		}
+
+		size_type size () const
+		{
+			return _size;
+		}
+
+		size_type max_size () const
+		{
+			return std::numeric_limits<size_type>::max ();
 		}
 
 		iterator begin ()
 		{
-			// @Todo: Make this O(1)
-			node_type *node = _root;
-			while (node && node->left)
-				node = node->left;
-	
-			return iterator (this, node);
+			iterator it = iterator (this, (node_type *)RBT_NODE_BEGIN);
+
+			return ++it;
+		}
+
+		const_iterator begin () const
+		{
+			const_iterator it = const_iterator (this, (node_type *)RBT_NODE_BEGIN);
+
+			return ++it;
 		}
 
 		iterator end ()
 		{
 			return iterator (this, (node_type *)RBT_NODE_END);
+		}
+
+		const_iterator end () const
+		{
+			return const_iterator (this, (node_type *)RBT_NODE_END);
+		}
+
+		reverse_iterator rbegin ()
+		{
+			return reverse_iterator (end ());
+		}
+
+		const_reverse_iterator rbegin () const
+		{
+			return const_reverse_iterator (end ());
+		}
+
+		reverse_iterator rend ()
+		{
+			return reverse_iterator (begin ());
+		}
+
+		const_reverse_iterator rend () const
+		{
+			return const_reverse_iterator (begin ());
 		}
 
 	private:
@@ -278,6 +407,12 @@ namespace ft
 			bst_insert (node);
 			node->is_black = false;
 			insert_fixup (node);
+		}
+
+		void erase(node_type *node)
+		{
+			// @Todo
+			bst_erase (node);
 		}
 
 		void left_rotate (node_type *x)
@@ -498,27 +633,6 @@ namespace ft
 					successor->right->parent = successor;
 			}
 		}
-
-		node_type *search (const value_type &value)
-		{
-			node_type *node = _root;
-			while (node)
-			{
-				if (node->value == value)
-					break;
-				else if (_less_than (value, node->value))
-					node = node->left;
-				else
-					node = node->right;
-			}
-
-			return node;
-		}
-
-	private:
-		node_type *_root;
-		value_compare _less_than;
-		allocator_type _alloc;
 	};
 }
 

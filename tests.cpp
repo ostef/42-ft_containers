@@ -150,10 +150,10 @@ int test_vector ()
 }
 
 template<typename T>
-bool ensure_sorted (T &rbt)
+bool ensure_sorted (const T &rbt)
 {
 	int prev = (int)0xffffffff;
-	for (typename T::iterator it = rbt.begin (); it != rbt.end (); it++)
+	for (typename T::const_iterator it = rbt.begin (); it != rbt.end (); it++)
 	{
 		if (*it < prev)
 			return false;
@@ -165,9 +165,9 @@ bool ensure_sorted (T &rbt)
 
 #ifndef STD_TEST
 template<typename T>
-bool ensure_no_loop_in_rbt (ft::rbt<T> &rbt)
+bool ensure_no_loop_in_rbt (const ft::rbt<T> &rbt)
 {
-	typedef typename ft::rbt<T>::iterator It;
+	typedef typename ft::rbt<T>::const_iterator It;
 	typedef ft::vector<It> VecIt;
 
 	VecIt visited_nodes;
