@@ -6,7 +6,7 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/03 13:08:55 by soumanso          #+#    #+#             */
-/*   Updated: 2022/10/21 23:47:51 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/10/21 23:55:42 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,6 +101,7 @@ namespace ft
 		reference operator* () const
 		{
 			iterator_type it = _base;
+			// @Speed: operator-- might be slow, like in rbt. We should cache its result
 			return *(--it);
 		}
 		
