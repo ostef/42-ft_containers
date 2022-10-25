@@ -20,7 +20,7 @@
 
 namespace ft
 {
-	template<class T>
+	template<typename T>
 	struct rbt_node
 	{
 		typedef rbt_node<T> this_type;
@@ -262,9 +262,9 @@ namespace ft
 	};
 
 	template<
-		class T,
-		class Compare = std::less<T>,
-		class Allocator = std::allocator<rbt_node<T> >
+		typename T,
+		typename Compare = std::less<T>,
+		typename Allocator = std::allocator<rbt_node<T> >
 	>
 	class rbt
 	{
@@ -288,12 +288,36 @@ namespace ft
 		allocator_type _alloc;
 
 	public:
-		explicit rbt (const allocator_type &alloc = allocator_type ()) :
-			_root (NULL), _less_than (), _alloc (alloc) {}
+		rbt () : _root (NULL), _less_than (Compare ()), _alloc (allocator_type ()) {}
+
+		explicit rbt (const Compare &comp, const allocator_type &alloc = allocator_type ()) :
+			_root (NULL), _less_than (comp), _alloc (alloc) {}
+
+		template<typename InputIt>
+		rbt (InputIt first, InputIt last, const Compare &comp = Compare (), const allocator_type &alloc = allocator_type ()) :
+			_root (NULL), _less_than (comp), _alloc (alloc)
+		{
+			for (InputIt it = first; it != last; it++)
+				insert (*it);
+		}
+
+		rbt (const rbt &other) :
+			_root (NULL), _less_than (other._less_than), _alloc (other._alloc)
+		{
+			for (const_iterator it = other.begin (); it != other.end (); it++)
+				insert (*it);
+		}
 
 		~rbt ()
 		{
 			// @Todo
+		}
+
+		rbt &operator= (const rbt &other)
+		{
+			clear ();
+			for (const_iterator it = other.begin (); it != other.end (); it++)
+				insert (*it);
 		}
 
 		node_type *root ()
@@ -306,55 +330,104 @@ namespace ft
 			return _root;
 		}
 
-		void insert (const value_type &val)
+		iterator insert (const value_type &val)
 		{
 			node_type *node = _alloc.allocate (sizeof (node_type));
 			_alloc.construct (node, val);
 			insert (node);
 			_size += 1;
+
+			return iterator (this, node);
 		}
 
-		iterator erase(iterator it)
+		iterator erase (iterator it)
 		{
 			// @Todo
 			return it;
 		}
 
-		iterator search (const value_type &value)
+		iterator erase (iterator first, iterator last)
+		{
+			// @Todo
+			return first;
+		}
+
+		void clear ()
+		{
+			while (_root)
+				erase (_root);
+		}
+
+		void swap (const rbt &other)
+		{
+			node_type *tmp_root = _root;
+			size_type tmp_size = _size;
+			value_compare tmp_less_than = _less_than;
+			
+			_root = other._root;
+			_size = other._size;
+			_less_than = other._less_than;
+
+			other._root = tmp_root;
+			other._size = tmp_size;
+			other._less_than = tmp_less_than;
+
+			std::swap (_alloc, other._alloc);
+		}
+
+		template<typename Comp, typename Key>
+		iterator find (const Key &key, Comp less_than)
 		{
 			node_type *node = _root;
 			while (node)
 			{
-				if (node->value == value)
-					break;
-				else if (_less_than (value, node->value))
+				if (less_than (key, node->value))
 					node = node->left;
-				else
+				else if (less_than (node->value, key))
 					node = node->right;
+				else
+					break;
 			}
+			if (!node)
+				return iterator (this, (node_type *)RBT_NODE_END);
 
 			return iterator (this, node);
 		}
 
-		allocator_type get_allocator () const
+		template<typename Comp, typename Key>
+		const_iterator find (const Key &key, Comp less_than) const
 		{
-			return _alloc;
+			const node_type *node = _root;
+			while (node)
+			{
+				if (less_than (key, node->value))
+					node = node->left;
+				else if (less_than (node->value, key))
+					node = node->right;
+				else
+					break;
+			}
+			if (!node)
+				return const_iterator (this, (const node_type *)RBT_NODE_END);
+
+			return const_iterator (this, node);
 		}
 
-		bool empty () const
+		iterator find (const value_type &value)
 		{
-			return !_root;
+			return find (value, _less_than);
 		}
 
-		size_type size () const
+		const_iterator find (const value_type &value) const
 		{
-			return _size;
+			return find (value, _less_than);
 		}
 
-		size_type max_size () const
-		{
-			return std::numeric_limits<size_type>::max ();
-		}
+		value_compare value_comp () const { return _less_than; }
+		allocator_type get_allocator () const { return _alloc; }
+		bool empty () const { return !_root; }
+		size_type size () const { return _size; }
+		size_type max_size () const { return std::numeric_limits<size_type>::max (); }
 
 		iterator begin ()
 		{
@@ -380,25 +453,11 @@ namespace ft
 			return const_iterator (this, (node_type *)RBT_NODE_END);
 		}
 
-		reverse_iterator rbegin ()
-		{
-			return reverse_iterator (end ());
-		}
+		reverse_iterator rbegin () { return reverse_iterator (end ()); }
+		const_reverse_iterator rbegin () const { return const_reverse_iterator (end ()); }
 
-		const_reverse_iterator rbegin () const
-		{
-			return const_reverse_iterator (end ());
-		}
-
-		reverse_iterator rend ()
-		{
-			return reverse_iterator (begin ());
-		}
-
-		const_reverse_iterator rend () const
-		{
-			return const_reverse_iterator (begin ());
-		}
+		reverse_iterator rend () { return reverse_iterator (begin ()); }
+		const_reverse_iterator rend () const { return const_reverse_iterator (begin ()); }
 
 	private:
 
