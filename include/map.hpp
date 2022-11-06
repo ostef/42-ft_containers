@@ -15,7 +15,7 @@
 
 #include <functional>
 #include <memory>
-#include "rbt.hpp"
+#include "avl.hpp"
 #include "utility.hpp"
 #include "type_traits.hpp"
 #include "iterator.hpp"
@@ -35,7 +35,7 @@ namespace ft
 		typedef Key key_type;
 		typedef T mapped_type;
 		typedef pair<const Key, T> value_type;
-		typedef rbt<value_type, Compare, Allocator> tree;
+		typedef avl_tree<value_type, Compare, Allocator> tree;
 		typedef typename tree::size_type size_type;
 		typedef ptrdiff_t difference_type;
 		typedef Compare key_compare;
@@ -91,6 +91,9 @@ namespace ft
 		protected:
 			Compare comp;
 		};
+
+	private:
+		tree _tree;
 
 	public:
 		map () : _tree () {}
@@ -253,9 +256,6 @@ namespace ft
 
 		iterator rend () { return _tree.rend (); }
 		const_iterator rend () const { return _tree.rend (); }
-
-	private:
-		rbt<value_type, value_compare, allocator_type> _tree;
 	};
 }
 
