@@ -24,6 +24,7 @@
 	#include <type_traits.hpp>
 	#include <iterator.hpp>
 	#include <vector.hpp>
+	#include <avl.hpp>
 	#include <map.hpp>
 	#include <stack.hpp>
 #endif
@@ -164,15 +165,15 @@ bool ensure_sorted (const T &rbt)
 }
 
 #ifndef STD_TEST
-template<typename T>
-bool ensure_no_loop_in_rbt (const ft::rbt<T> &rbt)
+template<typename Tree>
+bool ensure_no_loop_in_tree (const Tree &tree)
 {
-	typedef typename ft::rbt<T>::const_iterator It;
+	typedef typename Tree::const_iterator It;
 	typedef ft::vector<It> VecIt;
 
 	VecIt visited_nodes;
 
-	for (It it = rbt.begin (); it != rbt.end (); it++)
+	for (It it = tree.begin (); it != tree.end (); it++)
 	{
 		for (typename VecIt::iterator it2 = visited_nodes.begin (); it2 != visited_nodes.end (); it2++)
 		{
@@ -186,35 +187,46 @@ bool ensure_no_loop_in_rbt (const ft::rbt<T> &rbt)
 }
 #endif
 
-int test_rbt ()
+int test_avl_tree ()
 {
 	int ko = 0;
 
 #ifndef STD_TEST
 
-	ft::rbt<int> rbt = ft::rbt<int> ();
-	rbt.insert (10);
-	rbt.insert (12);
-	rbt.insert (9);
-	rbt.insert (11);
+	ft::avl_tree<int> tree = ft::avl_tree<int> ();
+	tree.insert (10);
+	tree.insert (12);
+	tree.insert (9);
+	tree.insert (11);
 
-	PRINT (rbt.begin (), rbt.end ());
-	EXPECT (ensure_sorted (rbt));
+	PRINT (tree.begin (), tree.end ());
+	EXPECT (ensure_sorted (tree));
 
 	{
-		ft::rbt<int>::iterator it = rbt.end ();
+		ft::avl_tree<int>::iterator it = tree.end ();
 		--it;
 		++it;
-		EXPECT (it == rbt.end ());
+		EXPECT (it == tree.end ());
 	}
 
 	for (int i = 0; i < 1000; i += 1)
 	{
-		rbt.insert (rand ());
-		//EXPECT (ensure_no_loop_in_rbt (rbt));
+		tree.insert (rand ());
+		EXPECT (ensure_no_loop_in_tree (tree));
 	}
 
-	EXPECT (ensure_sorted (rbt));
+	EXPECT (ensure_sorted (tree));
+
+	for (int i = 0; i < 1000; i += 1)
+	{
+		ft::avl_tree<int>::iterator it = tree.find (rand ());
+		if (it != tree.end ())
+		{
+			tree.erase (it);
+		}
+
+		EXPECT (ensure_no_loop_in_tree (tree));
+	}
 #endif
 
 	return ko;
@@ -227,8 +239,8 @@ int main ()
 	ko += test_is_integral ();
 	std::cout << "========= vector =========" << std::endl;
 	ko += test_vector ();
-	std::cout << "========= rbt =========" << std::endl;
-	ko += test_rbt ();
+	std::cout << "========= avl_tree =========" << std::endl;
+	ko += test_avl_tree ();
 	std::cout << ko << " KOs total." << std::endl;
 
 	return 0;
