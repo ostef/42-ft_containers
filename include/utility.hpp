@@ -6,7 +6,7 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/03 14:27:47 by soumanso          #+#    #+#             */
-/*   Updated: 2022/10/21 16:46:32 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/10/31 14:44:38 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include <iostream>
 
 #ifndef ASSERT
-# define ASSERT(x) { if (!(x)) { std::cerr << "Assertion failed: " << #x << std::endl; abort (); } }
+# define ASSERT(x) { if (!(x)) { std::cerr << "Assertion failed at file " << __FILE__ << ", line " << __LINE__ << ": " #x << std::endl; abort (); } }
 #endif
 
 namespace ft
