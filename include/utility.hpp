@@ -6,7 +6,7 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/03 14:27:47 by soumanso          #+#    #+#             */
-/*   Updated: 2022/10/31 14:44:38 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/11/07 16:45:47 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,6 +101,35 @@ namespace ft
 	bool operator>= (const pair<T1, T2> &left, const pair<T1, T2> &right)
 	{
 		return right <= left;
+	}
+
+	template<class TInput_It1, class TInput_It2>
+	bool lexicographical_compare (TInput_It1 first1, TInput_It1 last1, TInput_It2 first2, TInput_It2 last2)
+	{
+		for (; (first1 != last1) && (first2 != last2); ++first1, (void) ++first2)
+		{
+			if (*first1 < *first2)
+				return true;
+			if (*first2 < *first1)
+				return false;
+		}
+
+		return (first1 == last1) && (first2 != last2);
+	}
+
+	
+	template<class TInput_It1, class TInput_It2, class Compare>
+	bool lexicographical_compare (TInput_It1 first1, TInput_It1 last1, TInput_It2 first2, TInput_It2 last2, Compare comp)
+	{
+		for (; (first1 != last1) && (first2 != last2); ++first1, (void) ++first2)
+		{
+			if (comp (*first1, *first2))
+				return true;
+			if (comp (*first2, *first1))
+				return false;
+		}
+
+		return (first1 == last1) && (first2 != last2);
 	}
 }
 

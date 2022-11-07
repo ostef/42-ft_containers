@@ -6,7 +6,7 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/03 13:08:55 by soumanso          #+#    #+#             */
-/*   Updated: 2022/10/21 23:55:42 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/11/07 16:52:50 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,7 @@ namespace ft
 		pointer operator-> () const
 		{
 			iterator_type it = _base;
-			return (--it).operator-> ();
+			return &*(--it);
 		}
 
 		reference operator[] (difference_type n) const
@@ -213,13 +213,13 @@ namespace ft
 		return it + n;
 	}
 
-	template<class TIter>
-	typename reverse_iterator<TIter>::difference_type operator- (
-		const reverse_iterator<TIter> &left,
-		const reverse_iterator<TIter> &right
+	template<class TIter_Left, class TIter_Right>
+	typename reverse_iterator<TIter_Left>::difference_type operator- (
+		const reverse_iterator<TIter_Left> &left,
+		const reverse_iterator<TIter_Right> &right
 	)
 	{
-		return left.base () - right.base ();
+		return right.base () - left.base ();
 	}
 }
 

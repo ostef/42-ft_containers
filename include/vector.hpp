@@ -6,7 +6,7 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 20:23:47 by soumanso          #+#    #+#             */
-/*   Updated: 2022/10/21 23:47:51 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/11/07 16:50:24 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,11 +17,13 @@
 #include <stdexcept>
 #include <stddef.h>
 #include <limits>
+#include "utility.hpp"
 #include "iterator.hpp"
+#include "type_traits.hpp"
 
 namespace ft
 {
-	template<class T, class TAllocator = std::allocator<T>>
+	template<class T, class TAllocator = std::allocator<T> >
 	class vector
 	{
 	public:
@@ -47,7 +49,8 @@ namespace ft
 		vector (
 			TInput_Iterator first,
 			TInput_Iterator last,
-			const allocator_type &alloc = allocator_type ()
+			const allocator_type &alloc = allocator_type (),
+			typename enable_if<!is_integral<TInput_Iterator>::value>::type *enabled = 0
 		);
 		vector (const this_type &other);
 		~vector ();
@@ -62,7 +65,8 @@ namespace ft
 		template<class TInput_Iterator>
 		void assign (
 			TInput_Iterator first,
-			TInput_Iterator last
+			TInput_Iterator last,
+			typename enable_if<!is_integral<TInput_Iterator>::value>::type *enabled = 0
 		);
 		void assign (
 			size_type n,
@@ -99,7 +103,6 @@ namespace ft
 		);
 
 		iterator erase (iterator position);
-
 		iterator erase (iterator first, iterator last);
 
 		reference at (size_type n);
@@ -120,8 +123,8 @@ namespace ft
 		const_reverse_iterator rend () const;
 
 		bool empty () const;
-		value_type *data () noexcept;
-		const value_type *data () const noexcept;
+		value_type *data ();
+		const value_type *data () const;
 		size_type capacity () const;
 		size_type size () const;
 		size_type max_size () const;
@@ -155,7 +158,7 @@ namespace ft
 		_capacity (0),
 		_alloc (alloc)
 	{
-		insert (begin (), n, val);
+		assign (n, val);
 	}
 
 	template<class T, class TAllocator>
@@ -163,29 +166,35 @@ namespace ft
 	vector<T, TAllocator>::vector (
 		TInput_Iterator first,
 		TInput_Iterator last,
-		const allocator_type &alloc
+		const allocator_type &alloc,
+		typename enable_if<!is_integral<TInput_Iterator>::value>::type *enabled
 	) :
 		_data (NULL),
 		_size (0),
 		_capacity (0),
 		_alloc (alloc)
 	{
-		insert (begin (), first, last);
+		(void)enabled;
+
+		assign (first, last);
 	}
 
 	template<class T, class TAllocator>
-	vector<T, TAllocator>::vector (const this_type &other)
+	vector<T, TAllocator>::vector (const this_type &other) :
+		_data (NULL),
+		_size (0),
+		_capacity (0),
+		_alloc (other._alloc)
 	{
-		_alloc = other.get_allocator ();
-		_data = _alloc.allocate (other.capacity ());
-		_capacity = other.capacity ();
-		_size = 0;
 		assign (other.begin (), other.end ());
 	}
 
 	template<class T, class TAllocator>
 	vector<T, TAllocator>::~vector ()
 	{
+		for (size_t i = 0; i < _size; i += 1)
+			_alloc.destroy (_data + i);
+
 		_alloc.deallocate (_data, _capacity);
 		_data = NULL;
 		_size = 0;
@@ -198,6 +207,8 @@ namespace ft
 	typename vector<T, TAllocator>::this_type &vector<T, TAllocator>::operator= (const this_type &other)
 	{
 		assign (other.begin (), other.end ());
+
+		return *this;
 	}
 
 	template<class T, class TAllocator>
@@ -216,8 +227,14 @@ namespace ft
 
 	template<class T, class TAllocator>
 	template<class TInput_Iterator>
-	void vector<T, TAllocator>::assign (TInput_Iterator first, TInput_Iterator last)
+	void vector<T, TAllocator>::assign (
+		TInput_Iterator first,
+		TInput_Iterator last,
+		typename enable_if<!is_integral<TInput_Iterator>::value>::type *enabled
+	)
 	{
+		(void)enabled;
+
 		clear ();
 		for (TInput_Iterator it = first; it != last; ++it)
 			push_back (*it);
@@ -258,6 +275,7 @@ namespace ft
 	{
 		if (n <= _capacity)
 			return;
+
 		value_type *new_data = _alloc.allocate (n);
 		for (size_type i = 0; i < _size; i += 1)
 		{
@@ -337,11 +355,12 @@ namespace ft
 	void vector<T, TAllocator>::insert (typename vector<T, TAllocator>::iterator position, TInput_Iterator first, TInput_Iterator last, typename enable_if<!is_integral<TInput_Iterator>::value>::type *enabled)
 	{
 		(void)enabled;
-		if (last <= first)
-			return;
-
+	
 		size_type index = position - begin ();
-		size_type n = last - first;
+		size_type n = std::distance (first, last);
+		
+		if (n == 0)
+			return;
 		
 		if (_size + n > _capacity)
 			reserve (_capacity * 2 + n);
@@ -370,11 +389,11 @@ namespace ft
 	template<class T, class TAllocator>
 	typename vector<T, TAllocator>::iterator vector<T, TAllocator>::erase (vector<T, TAllocator>::iterator first, vector<T, TAllocator>::iterator last)
 	{
+		// "If [first, last) is an empty range, then last is returned"
 		if (last <= first)
 			return last;
 
 		size_type first_index = first - begin ();
-		size_type last_index = last - begin ();
 		size_type n = last - first;
 
 		for (size_type i = first_index; i + n < _size; i += 1)
@@ -383,10 +402,7 @@ namespace ft
 		for (size_type i = 0; i < n; i += 1)
 			pop_back ();
 
-		if (last_index >= _size)
-			return end ();
-		
-		return last;
+		return last - n;
 	}
 
 // Getters and setters, one-liners
@@ -494,13 +510,13 @@ namespace ft
 	}
 
 	template<class T, class TAllocator>
-	typename vector<T, TAllocator>::value_type *vector<T, TAllocator>::data () noexcept
+	typename vector<T, TAllocator>::value_type *vector<T, TAllocator>::data ()
 	{
 		return _data;
 	}
 
 	template<class T, class TAllocator>
-	const typename vector<T, TAllocator>::value_type *vector<T, TAllocator>::data () const noexcept
+	const typename vector<T, TAllocator>::value_type *vector<T, TAllocator>::data () const
 	{
 		return _data;
 	}
@@ -527,6 +543,52 @@ namespace ft
 	typename vector<T, TAllocator>::allocator_type vector<T, TAllocator>::get_allocator () const
 	{
 		return _alloc;
+	}
+
+	// Relational operators
+
+	template<class T, class TAllocator>
+	bool operator== (const vector<T, TAllocator> &lhs, const vector<T, TAllocator> &rhs)
+	{
+		if (lhs.size () != rhs.size ())
+			return false;
+		for (size_t i = 0; i < lhs.size (); i += 1)
+		{
+			if (lhs[i] != rhs[i])
+				return false;
+		}
+
+		return true;
+	}
+
+	template<class T, class TAllocator>
+	bool operator!= (const vector<T, TAllocator> &lhs, const vector<T, TAllocator> &rhs)
+	{
+		return !(lhs == rhs);
+	}
+
+	template<class T, class TAllocator>
+	bool operator< (const vector<T, TAllocator> &lhs, const vector<T, TAllocator> &rhs)
+	{
+		return lexicographical_compare (lhs.begin (), lhs.end (), rhs.begin (), rhs.end ());
+	}
+
+	template<class T, class TAllocator>
+	bool operator> (const vector<T, TAllocator> &lhs, const vector<T, TAllocator> &rhs)
+	{
+		return lexicographical_compare (rhs.begin (), rhs.end (), lhs.begin (), lhs.end ());
+	}
+
+	template<class T, class TAllocator>
+	bool operator<= (const vector<T, TAllocator> &lhs, const vector<T, TAllocator> &rhs)
+	{
+		return lhs < rhs || lhs == rhs;
+	}
+
+	template<class T, class TAllocator>
+	bool operator>= (const vector<T, TAllocator> &lhs, const vector<T, TAllocator> &rhs)
+	{
+		return lhs > rhs || lhs == rhs;
 	}
 }
 
