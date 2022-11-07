@@ -215,7 +215,7 @@ namespace ft
 				}
 			}
 
-			node_type *node = _alloc.allocate (sizeof (node_type));
+			node_type *node = _alloc.allocate (1);
 			_alloc.construct (node);
 			node->parent = parent;
 
@@ -689,7 +689,7 @@ namespace ft
 
 			_size -= 1;
 			_alloc.destroy (target);
-			_alloc.deallocate (target, sizeof (node_type));
+			_alloc.deallocate (target, 1);
 		}
 	};
 }
