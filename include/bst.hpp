@@ -3,9 +3,6 @@
 
 #include "utility.hpp"
 
-#define BST_NODE_BEGIN ((void *)0x01)
-#define BST_NODE_END ((void *)0x02)
-
 namespace ft
 {
 	template<typename T>
