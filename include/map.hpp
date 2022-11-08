@@ -35,20 +35,12 @@ namespace ft
 		typedef Key key_type;
 		typedef T mapped_type;
 		typedef pair<const Key, T> value_type;
-		typedef avl_tree<value_type, Compare, Allocator> tree;
-		typedef typename tree::size_type size_type;
-		typedef ptrdiff_t difference_type;
-		typedef Compare key_compare;
 		typedef Allocator allocator_type;
+		typedef Compare key_compare;
 		typedef value_type &reference;
 		typedef const value_type &const_reference;
 		typedef typename Allocator::pointer pointer;
 		typedef typename Allocator::const_pointer const_pointer;
-
-		typedef typename tree::iterator iterator;
-		typedef typename tree::const_iterator const_iterator;
-		typedef typename tree::reverse_iterator reverse_iterator;
-		typedef typename tree::const_reverse_iterator const_reverse_iterator;
 
 		class value_compare
 		{
@@ -58,17 +50,27 @@ namespace ft
 			typedef value_type second_argument_type;
 
 		public:
+			value_compare (Compare c) : comp (c) {}
+
 			bool operator() (const value_type &lhs, const value_type &rhs) const
 			{
 				return comp (lhs.first, rhs.first);
 			}
 
 		protected:
-			value_compare (Compare c) : comp (c) {}
-
-		protected:
 			Compare comp;
 		};
+
+		typedef typename allocator_type::template rebind<avl_node<value_type > >::other node_allocator;
+		typedef avl_tree<value_type, value_compare, node_allocator> tree;
+
+		typedef typename tree::iterator iterator;
+		typedef typename tree::const_iterator const_iterator;
+		typedef typename tree::reverse_iterator reverse_iterator;
+		typedef typename tree::const_reverse_iterator const_reverse_iterator;
+
+		typedef typename tree::size_type size_type;
+		typedef ptrdiff_t difference_type;
 
 	private:
 
@@ -80,13 +82,12 @@ namespace ft
 			typedef value_type second_argument_type;
 
 		public:
+			key_value_compare (Compare c) : comp (c) {}
+
 			bool operator() (const key_type &lhs, const value_type &rhs) const
 			{
 				return comp (lhs, rhs.first);
 			}
-
-		protected:
-			key_value_compare (Compare c) : comp (c) {}
 
 		protected:
 			Compare comp;
@@ -116,11 +117,7 @@ namespace ft
 
 		pair<iterator, bool> insert (const value_type &value)
 		{
-			iterator it = _tree.find (value);
-			if (it != _tree.end ())
-				return make_pair (it, false);
-
-			return make_pair (_tree.insert (value), true);
+			return _tree.insert (value);
 		}
 
 		iterator insert (iterator pos, const value_type &value)

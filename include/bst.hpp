@@ -20,43 +20,75 @@ namespace ft
 		typedef const typename T::value_type value_type;
 	};
 
-	template<typename Container, typename Node>
+	template<typename Node>
 	class bst_iterator
 	{
 	public:
-		typedef Container container_type;
 		typedef Node node_type;
 		typedef typename keep_const<node_type>::value_type value_type;
 
 	private:
-		container_type *_tree;
 		node_type *_node;
+		node_type *_before_begin;
+		node_type *_past_end;
+	
+	private:
+		bst_iterator () : _node (NULL), _before_begin (NULL), _past_end (NULL) {}
 
 	public:
-		bst_iterator () : _tree (NULL), _node ((node_type *)BST_NODE_END) {}
-		bst_iterator (const bst_iterator &other) : _tree (other._tree), _node (other._node) {}
-		bst_iterator (container_type *tree, node_type *node) : _tree (tree), _node (node) {}
+		
+		template<typename Other_Node>
+		bst_iterator (const bst_iterator<Other_Node> &other) :
+			_node (other.node ()), _before_begin (other.before_begin ()), _past_end (other.past_end ()) {}
 
-		bst_iterator &operator= (const bst_iterator &other)
+		template<typename Tree>
+		bst_iterator (Tree &tree, node_type *node) :
+			_node (node), _before_begin (tree.before_begin ()), _past_end (tree.past_end ()) {}
+
+		template<typename Tree>
+		bst_iterator (const Tree &tree, node_type *node) :
+			_node (node), _before_begin (tree.before_begin ()), _past_end (tree.past_end ()) {}
+
+		bst_iterator (node_type *node, node_type *before_begin, node_type *past_end) :
+			_node (node), _before_begin (before_begin), _past_end (past_end) {}
+
+		template<typename Other_Node>
+		bst_iterator &operator= (const bst_iterator<Other_Node> &other)
 		{
-			_tree = other._tree;
 			_node = other._node;
+			_before_begin = other._before_begin;
+			_past_end = other._past_end;
 			
 			return *this;
 		}
 
-		bool operator== (const bst_iterator &other)
+		template<typename Other_Node>
+		bool operator== (const bst_iterator<Other_Node> &other)
 		{
-			return _tree == other._tree && _node == other._node;
+			return _node == other.node () && _before_begin == other.before_begin () && _past_end == other.past_end ();
 		}
 
-		bool operator!= (const bst_iterator &other)
+		template<typename Other_Node>
+		bool operator!= (const bst_iterator<Other_Node> &other)
 		{
 			return !(*this == other);
 		}
 
-		value_type &operator* () { return _node->value; }
-		value_type *operator-> () { return &_node->value; }
+		value_type &operator* () const
+		{
+			if (_node == _before_begin || _node == _past_end)
+				throw std::runtime_error ("invalid iterator");
+			
+			return _node->value;
+		}
+
+		value_type *operator-> () const
+		{
+			if (_node == _before_begin || _node == _past_end)
+				throw std::runtime_error ("invalid iterator");
+			
+			return &_node->value;
+		}
 
 		bst_iterator &operator++ ()
 		{
@@ -84,56 +116,61 @@ namespace ft
 			return tmp;
 		}
 
-		container_type *tree ()
-		{
-			return _tree;
-		}
-
-		node_type *node ()
+		node_type *node () const
 		{
 			return _node;
+		}
+
+		node_type *before_begin () const
+		{
+			return _before_begin;
+		}
+
+		node_type *past_end () const
+		{
+			return _past_end;
 		}
 
 	private:
 
 		bst_iterator next ()
 		{
-			if (_node == (node_type *)BST_NODE_BEGIN)
+			if (_node == _before_begin)
 			{
-				node_type *node = _tree->root ()->leftmost ();
+				node_type *node = _node->right->leftmost ();
 				if (!node)
-					node = (node_type *)BST_NODE_END;
+					node = _past_end;
 
-				return bst_iterator (_tree, node);
+				return bst_iterator (node, _before_begin, _past_end);
 			}
-			else if (_node == (node_type *)BST_NODE_END)
+			else if (_node == _past_end)
 				return bst_iterator (*this);
 
 			node_type *node = _node->successor ();
 			if (!node)
-				node = (node_type *)BST_NODE_END;
+				node = _past_end;
 
-			return bst_iterator (_tree, node);
+			return bst_iterator (node, _before_begin, _past_end);
 		}
 
 		bst_iterator prev ()
 		{
-			if (_node == (node_type *)BST_NODE_END)
+			if (_node == _past_end)
 			{
-				node_type *node = _tree->root ()->rightmost ();
+				node_type *node = _node->left->rightmost ();
 				if (!node)
-					node = (node_type *)BST_NODE_BEGIN;
+					node = _before_begin;
 
-				return bst_iterator (_tree, node);
+				return bst_iterator (node, _before_begin, _past_end);
 			}
-			else if (_node == (node_type *)BST_NODE_BEGIN)
+			else if (_node == _before_begin)
 				return bst_iterator (*this);
 
 			node_type *node = _node->predecessor ();
 			if (!node)
-				return bst_iterator (_tree, (node_type *)BST_NODE_BEGIN);
+				node = _before_begin;
 
-			return bst_iterator (_tree, node);
+			return bst_iterator (node, _before_begin, _past_end);
 		}
 	};
 }

@@ -1,6 +1,8 @@
 #ifndef FT_AVL_HPP
 #define FT_AVL_HPP
 
+#include "utility.hpp"
+#include "iterator.hpp"
 #include "bst.hpp"
 
 namespace ft
@@ -16,9 +18,9 @@ namespace ft
 		char balance_factor;
 		value_type value;
 
-		avl_node () :
+		explicit avl_node () :
 			parent (NULL), left (NULL), right (NULL), balance_factor (0), value () {}
-		avl_node (const value_type &val) :
+		explicit avl_node (const value_type &val) :
 			parent (NULL), left (NULL), right (NULL), balance_factor (0), value (val) {}
 		avl_node (const avl_node &other) :
 			parent (other.parent), left (other.left), right (other.right), balance_factor (other.balance_factor), value (other.value) {}
@@ -29,6 +31,7 @@ namespace ft
 			parent = other.parent;
 			left = other.left;
 			right = other.right;
+			balance_factor = other.balance_factor;
 			value = other.value;
 
 			return *this;
@@ -135,40 +138,66 @@ namespace ft
 		typedef Compare value_compare;
 		typedef Allocator allocator_type;
 
-		typedef bst_iterator<this_type, node_type> iterator;
-		typedef bst_iterator<const this_type, const node_type> const_iterator;
+		typedef bst_iterator<node_type> iterator;
+		typedef bst_iterator<const node_type> const_iterator;
 		typedef ft::reverse_iterator<iterator> reverse_iterator;
 		typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
 
 	private:
+		// Do not assign the root directly unless you know what you're doing!
+		// Use set_root instead, to update the before begin and past end nodes.
 		node_type *_root;
+
+		// These two are pointers, because we need to be able to swap
+		// them so they belong to a different tree. Yeah that's fucked up,
+		// but this is so iterators from the tree before a swap point to
+		// the swapped tree after the swap. This seems like a shitty edge case,
+		// but we need to handle it anyways. Fuck C++, fuck all this.
+		node_type *_before_begin;
+		node_type *_past_end;
+
 		size_type _size;
 		value_compare _less_than;
 		allocator_type _alloc;
 	
 	public:
-		avl_tree () : _root (NULL), _less_than (Compare ()), _alloc (allocator_type ()) {}
+
+		avl_tree () : _root (NULL), _size (0), _less_than (Compare ()), _alloc (allocator_type ())
+		{
+			initialize_special_nodes ();
+		}
 
 		explicit avl_tree (const Compare &comp, const allocator_type &alloc = allocator_type ()) :
-			_root (NULL), _less_than (comp), _alloc (alloc) {}
+			_root (NULL), _size (0), _less_than (comp), _alloc (alloc)
+		{
+			initialize_special_nodes ();
+		}
 
 		template<typename InputIt>
 		avl_tree (InputIt first, InputIt last, const Compare &comp = Compare (), const allocator_type &alloc = allocator_type ()) :
-			_root (NULL), _less_than (comp), _alloc (alloc)
+			_root (NULL), _size (0), _less_than (comp), _alloc (alloc)
 		{
+			initialize_special_nodes ();
+
 			for (InputIt it = first; it != last; it++)
 				insert (*it);
 		}
 
 		avl_tree (const avl_tree &other) :
-			_root (NULL), _less_than (other._less_than), _alloc (other._alloc)
+			_root (NULL), _size (0), _less_than (other._less_than), _alloc (other._alloc)
 		{
+			initialize_special_nodes ();
+
 			for (const_iterator it = other.begin (); it != other.end (); it++)
 				insert (*it);
 		}
 
 		~avl_tree ()
 		{
+			_alloc.destroy (_before_begin);
+			_alloc.destroy (_past_end);
+			_alloc.deallocate (_before_begin, 2);
+
 			clear ();
 		}
 
@@ -188,6 +217,28 @@ namespace ft
 		{
 			return _root;
 		}
+
+		node_type *before_begin ()
+		{
+			return _before_begin;
+		}
+
+		const node_type *before_begin () const
+		{
+			return _before_begin;
+		}
+
+		
+		node_type *past_end ()
+		{
+			return _past_end;
+		}
+
+		const node_type *past_end () const
+		{
+			return _past_end;
+		}
+
 
 		pair<node_type *, bool> insert (const value_type &value)
 		{
@@ -216,11 +267,11 @@ namespace ft
 			}
 
 			node_type *node = _alloc.allocate (1);
-			_alloc.construct (node);
+			_alloc.construct (node, node_type (value));
 			node->parent = parent;
 
 			if (!parent)
-				_root = node;
+				set_root (node);
 			else if (less)
 				parent->left = node;
 			else
@@ -279,19 +330,14 @@ namespace ft
 
 		iterator erase (iterator it)
 		{
-			ASSERT (it.tree () == this);
-
 			node_type *next = it.node ()->successor ();
 			erase (it.node ());
 
-			return iterator (this, next);
+			return iterator (*this, next);
 		}
 
 		iterator erase (iterator first, iterator last)
 		{
-			ASSERT (first.tree () == this);
-			ASSERT (last.tree () == this);
-
 			iterator it = first;
 			iterator result = first;
 			while (it != last)
@@ -316,21 +362,28 @@ namespace ft
 			}
 		}
 
-		void swap (const avl_tree &other)
+		void swap (avl_tree &other)
 		{
 			node_type *tmp_root = _root;
+			node_type *tmp_before_begin = _before_begin;
+			node_type *tmp_past_end = _past_end;
 			size_type tmp_size = _size;
 			value_compare tmp_less_than = _less_than;
-			
+			allocator_type tmp_alloc = _alloc;
+
 			_root = other._root;
+			_before_begin = other._before_begin;
+			_past_end = other._past_end;
 			_size = other._size;
 			_less_than = other._less_than;
+			_alloc = other._alloc;
 
 			other._root = tmp_root;
+			other._before_begin = tmp_before_begin;
+			other._past_end = tmp_past_end;
 			other._size = tmp_size;
 			other._less_than = tmp_less_than;
-
-			std::swap (_alloc, other._alloc);
+			other._alloc = tmp_alloc;
 		}
 
 		template<typename Comp, typename Key>
@@ -347,9 +400,9 @@ namespace ft
 					break;
 			}
 			if (!node)
-				return iterator (this, (node_type *)BST_NODE_END);
+				return iterator (*this, _past_end);
 
-			return iterator (this, node);
+			return iterator (*this, node);
 		}
 
 		template<typename Comp, typename Key>
@@ -366,9 +419,9 @@ namespace ft
 					break;
 			}
 			if (!node)
-				return const_iterator (this, (const node_type *)BST_NODE_END);
+				return const_iterator (*this, _past_end);
 
-			return const_iterator (this, node);
+			return const_iterator (*this, node);
 		}
 
 		iterator find (const value_type &value)
@@ -389,26 +442,26 @@ namespace ft
 
 		iterator begin ()
 		{
-			iterator it = iterator (this, (node_type *)BST_NODE_BEGIN);
+			iterator it = iterator (*this, _before_begin);
 
 			return ++it;
 		}
 
 		const_iterator begin () const
 		{
-			const_iterator it = const_iterator (this, (node_type *)BST_NODE_BEGIN);
+			const_iterator it = const_iterator (*this, _before_begin);
 
 			return ++it;
 		}
 
 		iterator end ()
 		{
-			return iterator (this, (node_type *)BST_NODE_END);
+			return iterator (*this, _past_end);
 		}
 
 		const_iterator end () const
 		{
-			return const_iterator (this, (node_type *)BST_NODE_END);
+			return const_iterator (*this, _past_end);
 		}
 
 		reverse_iterator rbegin () { return reverse_iterator (end ()); }
@@ -418,6 +471,62 @@ namespace ft
 		const_reverse_iterator rend () const { return const_reverse_iterator (begin ()); }
 
 	private:
+
+		void initialize_special_nodes ()
+		{
+			_before_begin = _alloc.allocate (2);
+			_past_end = _before_begin + 1;
+
+			_alloc.construct (_before_begin, node_type ());
+			_alloc.construct (_past_end, node_type ());
+		}
+
+		void set_root (node_type *new_root)
+		{
+			_root = new_root;
+			_before_begin->right = new_root;
+			_past_end->left = new_root;
+		}
+
+		void swap_nodes (node_type *a, node_type *b)
+		{
+			bool left_child = a->is_left_child ();
+			node_type *tmp_parent = a->parent;
+			node_type *tmp_right = a->right;
+			node_type *tmp_left = a->left;
+			
+			a->parent = b->parent;
+			if (!a->parent)
+				set_root (a);
+			else if (b->is_left_child ())
+				a->parent->left = a;
+			else
+				a->parent->right = a;
+	
+			a->right = b->right;
+			if (a->right)
+				a->right->parent = a;
+	
+			a->left = b->left;
+			if (a->left)
+				a->left->parent = a;
+		
+			b->parent = tmp_parent;
+			if (!b->parent)
+				set_root (b);
+			else if (left_child)
+				b->parent->left = b;
+			else
+				b->parent->right = b;
+	
+			b->right = tmp_right;
+			if (b->right)
+				b->right->parent = b;
+	
+			b->left = tmp_left;
+			if (b->left)
+				b->left->parent = b;
+		}
 
 		node_type *rotate_left (node_type *parent)
 		{
@@ -429,7 +538,7 @@ namespace ft
 			
 			node->parent = parent->parent;
 			if (!parent->parent)
-				_root = node;
+				set_root (node);
 			else if (parent->is_left_child ())
 				parent->parent->left = node;
 			else
@@ -451,7 +560,7 @@ namespace ft
 			
 			node->parent = parent->parent;
 			if (!parent->parent)
-				_root = node;
+				set_root (node);
 			else if (parent->is_left_child ())
 				parent->parent->left = node;
 			else
@@ -625,7 +734,8 @@ namespace ft
 			else
 			{
 				target = node->successor ();
-				node->value = target->value;
+
+				swap_nodes (node, target);
 			}
 
 			node = target;
@@ -681,7 +791,7 @@ namespace ft
 				child->parent = target->parent;
 
 			if (!target->parent)
-				_root = child;
+				set_root (child);
 			else if (target->is_left_child ())
 				target->parent->left = child;
 			else

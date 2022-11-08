@@ -6,15 +6,18 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/03 14:27:47 by soumanso          #+#    #+#             */
-/*   Updated: 2022/11/07 16:45:47 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/11/08 18:11:00 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FT_UTILITY_HPP
 #define FT_UTILITY_HPP
 
+#include <cstddef>
 #include <cstdlib>
 #include <iostream>
+#include <limits>
+#include <exception>
 
 #ifndef ASSERT
 # define ASSERT(x) { if (!(x)) { std::cerr << "Assertion failed at file " << __FILE__ << ", line " << __LINE__ << ": " #x << std::endl; abort (); } }
