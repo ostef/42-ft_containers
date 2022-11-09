@@ -6,7 +6,7 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 20:23:47 by soumanso          #+#    #+#             */
-/*   Updated: 2022/11/07 16:50:24 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/11/09 15:40:01 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -552,13 +552,8 @@ namespace ft
 	{
 		if (lhs.size () != rhs.size ())
 			return false;
-		for (size_t i = 0; i < lhs.size (); i += 1)
-		{
-			if (lhs[i] != rhs[i])
-				return false;
-		}
 
-		return true;
+		return equal (lhs.begin (), lhs.end (), rhs.begin ());
 	}
 
 	template<class T, class TAllocator>
