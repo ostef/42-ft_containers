@@ -23,16 +23,21 @@ namespace ft
 	public:
 		typedef Node node_type;
 		typedef typename keep_const<node_type>::value_type value_type;
+		typedef ptrdiff_t difference_type;
+		typedef value_type *pointer;
+		typedef value_type &reference;
+		typedef std::bidirectional_iterator_tag iterator_category;
+
+		template<class Other_Node>
+		friend class bst_iterator;
 
 	private:
 		node_type *_node;
 		node_type *_before_begin;
 		node_type *_past_end;
-	
-	private:
-		bst_iterator () : _node (NULL), _before_begin (NULL), _past_end (NULL) {}
 
 	public:
+		bst_iterator () : _node (NULL), _before_begin (NULL), _past_end (NULL) {}
 		
 		template<typename Other_Node>
 		bst_iterator (const bst_iterator<Other_Node> &other) :

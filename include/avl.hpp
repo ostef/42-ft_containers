@@ -206,6 +206,8 @@ namespace ft
 			clear ();
 			for (const_iterator it = other.begin (); it != other.end (); it++)
 				insert (*it);
+
+			return *this;
 		}
 
 		node_type *root ()
@@ -240,7 +242,7 @@ namespace ft
 		}
 
 
-		pair<node_type *, bool> insert (const value_type &value)
+		pair<iterator, bool> insert (const value_type &value)
 		{
 			node_type *curr = _root;
 			node_type *parent =  NULL;
@@ -262,23 +264,24 @@ namespace ft
 				}
 				else
 				{
-					return make_pair (curr, false);
+					return ft::make_pair (iterator (*this, curr), false);
 				}
 			}
 
-			node_type *node = _alloc.allocate (1);
-			_alloc.construct (node, node_type (value));
-			node->parent = parent;
+			node_type *result = _alloc.allocate (1);
+			_alloc.construct (result, node_type (value));
+			result->parent = parent;
 
 			if (!parent)
-				set_root (node);
+				set_root (result);
 			else if (less)
-				parent->left = node;
+				parent->left = result;
 			else
-				parent->right = node;
+				parent->right = result;
 			
 			_size += 1;
 
+			node_type *node = result;
 			while (parent)
 			{
 				if (node->is_left_child ())
@@ -325,7 +328,7 @@ namespace ft
 				parent = node->parent;
 			}
 
-			return make_pair (node, true);
+			return ft::make_pair (iterator (*this, result), true);
 		}
 
 		iterator erase (iterator it)
@@ -491,6 +494,7 @@ namespace ft
 		void swap_nodes (node_type *a, node_type *b)
 		{
 			bool left_child = a->is_left_child ();
+			bool right_child = a->is_right_child ();
 			node_type *tmp_parent = a->parent;
 			node_type *tmp_right = a->right;
 			node_type *tmp_left = a->left;
@@ -500,9 +504,11 @@ namespace ft
 				set_root (a);
 			else if (b->is_left_child ())
 				a->parent->left = a;
-			else
+			else if (b->is_right_child ())
 				a->parent->right = a;
-	
+			else
+				ASSERT (false && "Invalid path");
+
 			a->right = b->right;
 			if (a->right)
 				a->right->parent = a;
@@ -510,19 +516,27 @@ namespace ft
 			a->left = b->left;
 			if (a->left)
 				a->left->parent = a;
-		
+	
 			b->parent = tmp_parent;
 			if (!b->parent)
 				set_root (b);
 			else if (left_child)
 				b->parent->left = b;
-			else
+			else if (right_child)
 				b->parent->right = b;
-	
+			else
+				ASSERT (false && "Invalid path");
+
+			if (b == tmp_right)
+				tmp_right = a;
+
 			b->right = tmp_right;
 			if (b->right)
 				b->right->parent = b;
-	
+
+			if (b == tmp_left)
+				tmp_left = a;
+
 			b->left = tmp_left;
 			if (b->left)
 				b->left->parent = b;
@@ -726,19 +740,29 @@ namespace ft
 
 		void erase (node_type *node)
 		{
-			node_type *target;
-			if (!node->left || !node->right)
+			if (node->left && node->right)
 			{
-				target = node;
-			}
-			else
-			{
-				target = node->successor ();
+				node_type *suc = node->successor ();
 
-				swap_nodes (node, target);
+				swap_nodes (node, suc);
+
+				if (node->parent)
+					ASSERT (node->parent->left == node || node->parent->right == node);
+				if (node->left)
+					ASSERT (node->left->parent == node);
+				if (node->right)
+					ASSERT (node->right->parent == node);
+				
+				if (suc->parent)
+					ASSERT (suc->parent->left == suc || suc->parent->right == suc);
+				if (suc->left)
+					ASSERT (suc->left->parent == suc);
+				if (suc->right)
+					ASSERT (suc->right->parent == suc);
 			}
 
-			node = target;
+			node_type *target = node;
+
 			node_type *parent = node->parent;
 			while (parent)
 			{
@@ -802,6 +826,45 @@ namespace ft
 			_alloc.deallocate (target, 1);
 		}
 	};
+
+	template<class T, class Compare, class TAllocator>
+	bool operator== (const avl_tree<T, Compare, TAllocator> &lhs, const avl_tree<T, Compare, TAllocator> &rhs)
+	{
+		if (lhs.size () != rhs.size ())
+			return false;
+		
+		return equal (lhs.begin (), lhs.end (), rhs.begin ());
+	}
+
+	template<class T, class Compare, class TAllocator>
+	bool operator!= (const avl_tree<T, Compare, TAllocator> &lhs, const avl_tree<T, Compare, TAllocator> &rhs)
+	{
+		return !(lhs == rhs);
+	}
+
+	template<class T, class Compare, class TAllocator>
+	bool operator< (const avl_tree<T, Compare, TAllocator> &lhs, const avl_tree<T, Compare, TAllocator> &rhs)
+	{
+		return lexicographical_compare (lhs.begin (), lhs.end (), rhs.begin (), rhs.end ());
+	}
+
+	template<class T, class Compare, class TAllocator>
+	bool operator> (const avl_tree<T, Compare, TAllocator> &lhs, const avl_tree<T, Compare, TAllocator> &rhs)
+	{
+		return lexicographical_compare (rhs.begin (), rhs.end (), lhs.begin (), lhs.end ());
+	}
+
+	template<class T, class Compare, class TAllocator>
+	bool operator<= (const avl_tree<T, Compare, TAllocator> &lhs, const avl_tree<T, Compare, TAllocator> &rhs)
+	{
+		return lhs < rhs || lhs == rhs;
+	}
+
+	template<class T, class Compare, class TAllocator>
+	bool operator>= (const avl_tree<T, Compare, TAllocator> &lhs, const avl_tree<T, Compare, TAllocator> &rhs)
+	{
+		return lhs > rhs || lhs == rhs;
+	}
 }
 
 #endif

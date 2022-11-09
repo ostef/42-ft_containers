@@ -6,7 +6,7 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/03 14:27:47 by soumanso          #+#    #+#             */
-/*   Updated: 2022/11/08 18:11:00 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/11/09 15:43:04 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,30 @@ namespace ft
 	}
 
 	template<class TInput_It1, class TInput_It2>
+	bool equal (TInput_It1 first1, TInput_It1 last1, TInput_It2 first2)
+	{
+		for (; (first1 != last1); ++first1, (void) ++first2)
+		{
+			if (*first1 != *first2)
+				return false;
+		}
+
+		return true;
+	}
+
+	template<class TInput_It1, class TInput_It2, class Binary_Predicate>
+	bool equal (TInput_It1 first1, TInput_It1 last1, TInput_It2 first2, Binary_Predicate pred)
+	{
+		for (; (first1 != last1); ++first1, (void) ++first2)
+		{
+			if (!pred (*first1, *first2))
+				return false;
+		}
+
+		return true;
+	}
+
+	template<class TInput_It1, class TInput_It2>
 	bool lexicographical_compare (TInput_It1 first1, TInput_It1 last1, TInput_It2 first2, TInput_It2 last2)
 	{
 		for (; (first1 != last1) && (first2 != last2); ++first1, (void) ++first2)
@@ -120,7 +144,6 @@ namespace ft
 		return (first1 == last1) && (first2 != last2);
 	}
 
-	
 	template<class TInput_It1, class TInput_It2, class Compare>
 	bool lexicographical_compare (TInput_It1 first1, TInput_It1 last1, TInput_It2 first2, TInput_It2 last2, Compare comp)
 	{

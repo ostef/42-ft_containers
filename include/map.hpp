@@ -49,6 +49,8 @@ namespace ft
 			typedef value_type first_argument_type;
 			typedef value_type second_argument_type;
 
+			friend class map;
+
 		public:
 			value_compare (Compare c) : comp (c) {}
 
@@ -89,6 +91,11 @@ namespace ft
 				return comp (lhs, rhs.first);
 			}
 
+			bool operator() (const value_type &lhs, const key_type &rhs) const
+			{
+				return comp (lhs.first, rhs);
+			}
+
 		protected:
 			Compare comp;
 		};
@@ -97,7 +104,7 @@ namespace ft
 		tree _tree;
 
 	public:
-		map () : _tree () {}
+		map () : _tree (value_compare (Compare ()), allocator_type ()) {}
 
 		explicit map (const Compare &comp, const allocator_type &alloc = allocator_type ()) :
 			_tree (value_compare (comp), alloc) {}
@@ -113,6 +120,8 @@ namespace ft
 		map &operator= (const map &other)
 		{
 			_tree = other._tree;
+
+			return *this;
 		}
 
 		pair<iterator, bool> insert (const value_type &value)
@@ -167,21 +176,6 @@ namespace ft
 
 		size_type count (const Key &key) const
 		{
-			/*
-			// Slow code path, where we don't assume that we have at most 1
-			// This is here for testing purposes.
-
-			Compare comp = _tree.value_compare ().comp;
-			size_type result = 0;
-
-			for (const_iterator it = begin (); it != end (); it++)
-			{
-				if (!comp (it->first, key) && !comp (key, it->first))
-					result += 1;
-			}
-			ASSERT (result <= 1);
-			*/
-
 			const_iterator it = find (key);
 			if (it == _tree.end ())
 				return 0;
@@ -199,14 +193,59 @@ namespace ft
 			return _tree.find (key, key_value_compare (_tree.value_comp ().comp));
 		}
 
-		iterator lower_bound (const Key &key) { return find (key); }
-		const_iterator lower_bound (const Key &key) const { return find (key); }
+		pair<iterator, iterator> equal_range (const Key &key)
+		{
+			iterator lower = find (key);
+			bool found_lower_bound = lower != end ();
+			
+			if (!found_lower_bound)
+			{
+				for (lower = begin (); lower != end (); lower++)
+				{
+					if (_tree.value_comp ().comp (key, lower->first))
+						break;
+				}
+			}
 
-		iterator upper_bound (const Key &key) { return ++find (key); }
-		const_iterator upper_bound (const Key &key) const { return ++find (key); }
+			if (found_lower_bound)
+			{
+				iterator upper = lower;
 
-		pair<iterator, iterator> equal_range (const Key &key) { return make_pair (lower_bound (key), upper_bound (key)); }
-		pair<const_iterator, const_iterator> equal_range (const Key &key) const { return make_pair (lower_bound (key), upper_bound (key)); }
+				return ft::make_pair (lower, ++upper);
+			}
+
+			return ft::make_pair (lower, lower);
+		}
+		
+		pair<const_iterator, const_iterator> equal_range (const Key &key) const
+		{
+			const_iterator lower = find (key);
+			bool found_lower_bound = lower != end ();
+			
+			if (!found_lower_bound)
+			{
+				for (lower = begin (); lower != end (); lower++)
+				{
+					if (_tree.value_comp ().comp (key, lower->first))
+						break;
+				}
+			}
+
+			if (found_lower_bound)
+			{
+				const_iterator upper = lower;
+
+				return ft::make_pair (lower, ++upper);
+			}
+
+			return ft::make_pair (lower, lower);
+		}
+
+		iterator lower_bound (const Key &key) { return equal_range (key).first; }
+		const_iterator lower_bound (const Key &key) const { return equal_range (key).first; }
+
+		iterator upper_bound (const Key &key) { return equal_range (key).second; }
+		const_iterator upper_bound (const Key &key) const { return equal_range (key).second; }
 
 		T &at (const Key &key)
 		{
@@ -219,7 +258,7 @@ namespace ft
 
 		const T &at (const Key &key) const
 		{
-			typename tree::const_iterator it = _tree.find (key, key_value_compare (_tree.value_comp ().comp));
+			const_iterator it = _tree.find (key, key_value_compare (_tree.value_comp ().comp));
 			if (it == _tree.end ())
 				throw std::out_of_range ("key was not found in the map");
 		
@@ -229,10 +268,12 @@ namespace ft
 		T &operator[] (const Key &key)
 		{
 			iterator it = find (key);
-			if (it != _tree.end ())
-				return it->second;
+			if (it == _tree.end ())
+				it = _tree.insert (ft::make_pair (key, mapped_type ())).first;
+			
+			ASSERT (it->first == key && "Keys don't match");
 
-			return _tree.insert (make_pair (key, mapped_type ()))->second;
+			return it->second;
 		}
 
 		bool empty () const { return _tree.empty (); }
@@ -248,11 +289,41 @@ namespace ft
 		iterator end () { return _tree.end (); }
 		const_iterator end () const { return _tree.end (); }
 
-		iterator rbegin () { return _tree.rbegin (); }
-		const_iterator rbegin () const { return _tree.rbegin (); }
+		reverse_iterator rbegin () { return _tree.rbegin (); }
+		const_reverse_iterator rbegin () const { return _tree.rbegin (); }
 
-		iterator rend () { return _tree.rend (); }
-		const_iterator rend () const { return _tree.rend (); }
+		reverse_iterator rend () { return _tree.rend (); }
+		const_reverse_iterator rend () const { return _tree.rend (); }
+
+		friend bool operator== (const map &lhs, const map &rhs)
+		{
+			return lhs._tree == rhs._tree;
+		}
+
+		friend bool operator!= (const map &lhs, const map &rhs)
+		{
+			return lhs._tree != rhs._tree;
+		}
+
+		friend bool operator< (const map &lhs, const map &rhs)
+		{
+			return lhs._tree < rhs._tree;
+		}
+
+		friend bool operator> (const map &lhs, const map &rhs)
+		{
+			return lhs._tree > rhs._tree;
+		}
+
+		friend bool operator<= (const map &lhs, const map &rhs)
+		{
+			return lhs._tree <= rhs._tree;
+		}
+
+		friend bool operator>= (const map &lhs, const map &rhs)
+		{
+			return lhs._tree >= rhs._tree;;
+		}
 	};
 }
 
