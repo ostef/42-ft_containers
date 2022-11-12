@@ -356,13 +356,7 @@ namespace ft
 
 		void clear ()
 		{
-			node_type *node = _root->leftmost ();
-			while (node)
-			{
-				node_type *next = node->successor ();
-				erase (node);
-				node = next;
-			}
+			erase (begin (), end ());
 		}
 
 		void swap (avl_tree &other)
@@ -833,7 +827,7 @@ namespace ft
 		if (lhs.size () != rhs.size ())
 			return false;
 		
-		return equal (lhs.begin (), lhs.end (), rhs.begin ());
+		return ft::equal (lhs.begin (), lhs.end (), rhs.begin ());
 	}
 
 	template<class T, class Compare, class TAllocator>
@@ -845,13 +839,13 @@ namespace ft
 	template<class T, class Compare, class TAllocator>
 	bool operator< (const avl_tree<T, Compare, TAllocator> &lhs, const avl_tree<T, Compare, TAllocator> &rhs)
 	{
-		return lexicographical_compare (lhs.begin (), lhs.end (), rhs.begin (), rhs.end ());
+		return ft::lexicographical_compare (lhs.begin (), lhs.end (), rhs.begin (), rhs.end ());
 	}
 
 	template<class T, class Compare, class TAllocator>
 	bool operator> (const avl_tree<T, Compare, TAllocator> &lhs, const avl_tree<T, Compare, TAllocator> &rhs)
 	{
-		return lexicographical_compare (rhs.begin (), rhs.end (), lhs.begin (), lhs.end ());
+		return ft::lexicographical_compare (rhs.begin (), rhs.end (), lhs.begin (), lhs.end ());
 	}
 
 	template<class T, class Compare, class TAllocator>

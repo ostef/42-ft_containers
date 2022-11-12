@@ -6,12 +6,14 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/03 13:08:55 by soumanso          #+#    #+#             */
-/*   Updated: 2022/11/07 16:52:50 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/11/12 16:01:52 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FT_ITERATOR_HPP
 #define FT_ITERATOR_HPP
+
+#include <iterator>	// For std::distance
 
 namespace ft
 {

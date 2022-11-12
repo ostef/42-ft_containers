@@ -131,7 +131,7 @@ namespace ft
 
 		iterator insert (iterator pos, const value_type &value)
 		{
-			(void)pos;	// I am not sure what this is for
+			(void)pos;	// I am not sure what this is for, since map is an ordered data structure
 
 			return insert (value).first;
 		}

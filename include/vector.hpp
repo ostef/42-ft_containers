@@ -6,7 +6,7 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 20:23:47 by soumanso          #+#    #+#             */
-/*   Updated: 2022/11/09 15:40:01 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/11/12 16:36:37 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -315,6 +315,9 @@ namespace ft
 	template<class T, class TAllocator>
 	void vector<T, TAllocator>::pop_back ()
 	{
+		if (_size == 0)
+			throw std::runtime_error ("vector is empty");
+
 		_alloc.destroy (end () - 1);
 		_size -= 1;
 	}
@@ -553,7 +556,7 @@ namespace ft
 		if (lhs.size () != rhs.size ())
 			return false;
 
-		return equal (lhs.begin (), lhs.end (), rhs.begin ());
+		return ft::equal (lhs.begin (), lhs.end (), rhs.begin ());
 	}
 
 	template<class T, class TAllocator>
@@ -565,13 +568,13 @@ namespace ft
 	template<class T, class TAllocator>
 	bool operator< (const vector<T, TAllocator> &lhs, const vector<T, TAllocator> &rhs)
 	{
-		return lexicographical_compare (lhs.begin (), lhs.end (), rhs.begin (), rhs.end ());
+		return ft::lexicographical_compare (lhs.begin (), lhs.end (), rhs.begin (), rhs.end ());
 	}
 
 	template<class T, class TAllocator>
 	bool operator> (const vector<T, TAllocator> &lhs, const vector<T, TAllocator> &rhs)
 	{
-		return lexicographical_compare (rhs.begin (), rhs.end (), lhs.begin (), lhs.end ());
+		return ft::lexicographical_compare (rhs.begin (), rhs.end (), lhs.begin (), lhs.end ());
 	}
 
 	template<class T, class TAllocator>
