@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 *.o
 *.out
 *.a
@@ -6,11 +5,3 @@ ft
 std
 .vscode/
 obj/
-=======
-*.o
-*.out
-*.a
-.vscode/
-obj/
-*tests
->>>>>>> 2590376aff9c6eea00504b578919e05d962d3777
