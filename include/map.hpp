@@ -196,49 +196,51 @@ namespace ft
 		pair<iterator, iterator> equal_range (const Key &key)
 		{
 			iterator lower = find (key);
+			iterator upper;
 			bool found_lower_bound = lower != end ();
-			
-			if (!found_lower_bound)
+	
+			if (found_lower_bound)
+			{
+				upper = lower;
+				++upper;
+			}
+			else
 			{
 				for (lower = begin (); lower != end (); lower++)
 				{
 					if (_tree.value_comp ().comp (key, lower->first))
 						break;
 				}
+
+				upper = lower;
 			}
 
-			if (found_lower_bound)
-			{
-				iterator upper = lower;
-
-				return ft::make_pair (lower, ++upper);
-			}
-
-			return ft::make_pair (lower, lower);
+			return ft::make_pair (lower, upper);
 		}
 		
 		pair<const_iterator, const_iterator> equal_range (const Key &key) const
 		{
 			const_iterator lower = find (key);
+			const_iterator upper;
 			bool found_lower_bound = lower != end ();
-			
-			if (!found_lower_bound)
+	
+			if (found_lower_bound)
+			{
+				upper = lower;
+				++upper;
+			}
+			else
 			{
 				for (lower = begin (); lower != end (); lower++)
 				{
 					if (_tree.value_comp ().comp (key, lower->first))
 						break;
 				}
+
+				upper = lower;
 			}
 
-			if (found_lower_bound)
-			{
-				const_iterator upper = lower;
-
-				return ft::make_pair (lower, ++upper);
-			}
-
-			return ft::make_pair (lower, lower);
+			return ft::make_pair (lower, upper);
 		}
 
 		iterator lower_bound (const Key &key) { return equal_range (key).first; }
