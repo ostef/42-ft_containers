@@ -18,9 +18,9 @@ srcs="srcs"
 
 CC="clang++"
 CFLAGS="-Wall -Wextra -Werror"
-#CFLAGS+=" -std=c++98"	# Comment this line for is_integral tests
-CFLAGS+=" -fsanitize=address -g3"
-CFLAGS+=" -fsanitize=leak -g3"
+CFLAGS+=" -std=c++98"	# Comment this line for is_integral tests
+#CFLAGS+=" -fsanitize=address -g3"
+#CFLAGS+=" -fsanitize=leak -g3"
 
 ft_compile_output="ft_comp.log"
 std_compile_output="std_comp.log"
