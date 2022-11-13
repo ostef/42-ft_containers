@@ -6,12 +6,14 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/21 14:47:05 by soumanso          #+#    #+#             */
-/*   Updated: 2022/07/21 14:50:28 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/11/13 14:57:21 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FT_TYPE_TRAITS_HPP
 #define FT_TYPE_TRAITS_HPP
+
+#include <cstddef>
 
 namespace ft
 {
@@ -39,7 +41,7 @@ namespace ft
 	struct is_integral :
 		public integral_constant<bool, false> {};
 
-#define IS_INTEGRAL(T)\
+#define DECL_INTEGRAL(T)\
 	template<>\
 	struct is_integral<T> :\
 		public integral_constant<bool, true> {};\
@@ -53,19 +55,23 @@ namespace ft
 	struct is_integral<const volatile T> :\
 		public integral_constant<bool, true> {}
 
-	IS_INTEGRAL (bool);
-	IS_INTEGRAL (char);
-	IS_INTEGRAL (unsigned char);
-	IS_INTEGRAL (short);
-	IS_INTEGRAL (unsigned short);
-	IS_INTEGRAL (int);
-	IS_INTEGRAL (unsigned int);
-	IS_INTEGRAL (long);
-	IS_INTEGRAL (unsigned long);
-	IS_INTEGRAL (long long);
-	IS_INTEGRAL (unsigned long long);
+	DECL_INTEGRAL (bool);
+	DECL_INTEGRAL (char);
+	DECL_INTEGRAL (unsigned char);
+	DECL_INTEGRAL (short);
+	DECL_INTEGRAL (unsigned short);
+	DECL_INTEGRAL (int);
+	DECL_INTEGRAL (unsigned int);
+	DECL_INTEGRAL (long);
+	DECL_INTEGRAL (unsigned long);
+	DECL_INTEGRAL (long long);
+	DECL_INTEGRAL (unsigned long long);
 
-#undef IS_INTEGRAL
+	// These need special treatment, as they don't seem to be aliases for all of the above integer types...
+	DECL_INTEGRAL (wchar_t);
+	DECL_INTEGRAL (int8_t);
+
+#undef DECL_INTEGRAL
 }
 
 #endif

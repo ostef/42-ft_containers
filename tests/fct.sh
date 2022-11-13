@@ -18,8 +18,9 @@ srcs="srcs"
 
 CC="clang++"
 CFLAGS="-Wall -Wextra -Werror"
-CFLAGS+=" -std=c++98"
+#CFLAGS+=" -std=c++98"	# Comment this line for is_integral tests
 CFLAGS+=" -fsanitize=address -g3"
+CFLAGS+=" -fsanitize=leak -g3"
 
 ft_compile_output="ft_comp.log"
 std_compile_output="std_comp.log"
@@ -151,8 +152,8 @@ do_test () {
 }
 
 function main () {
-	containers=(vector map stack set)
-	# containers=(vector list map stack queue deque multimap set multiset)
+	containers=(misc vector map stack)
+
 	if [ $# -ne 0 ]; then
 		containers=($@);
 	fi

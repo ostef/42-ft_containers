@@ -194,11 +194,11 @@ namespace ft
 
 		~avl_tree ()
 		{
+			clear ();
+
 			_alloc.destroy (_before_begin);
 			_alloc.destroy (_past_end);
 			_alloc.deallocate (_before_begin, 2);
-
-			clear ();
 		}
 
 		avl_tree &operator= (const avl_tree &other)

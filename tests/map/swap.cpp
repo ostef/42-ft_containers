@@ -1,6 +1,7 @@
 #include "common.hpp"
+#include <vector>
 
-int main()
+int main ()
 {
 	typedef NS::map<std::string, int>::iterator iterator;
 	

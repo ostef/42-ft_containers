@@ -1,4 +1,5 @@
 #include "common.hpp"
+#include <vector>
 
 template<typename Container>
 void all_tests ()
