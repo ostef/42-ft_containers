@@ -6,7 +6,7 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 20:23:47 by soumanso          #+#    #+#             */
-/*   Updated: 2022/11/15 13:45:46 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/11/15 13:56:16 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ namespace ft
 		typedef const T               &const_reference;
 		typedef TAllocator            allocator_type;
 		typedef size_t                size_type;
+		typedef ptrdiff_t             difference_type;
 		typedef       T               *iterator;
 		typedef const T               *const_iterator;
 		typedef ft::reverse_iterator<iterator>       reverse_iterator;

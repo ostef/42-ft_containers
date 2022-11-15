@@ -1,5 +1,5 @@
-#ifndef FT_BST_HPP
-#define FT_BST_HPP
+#ifndef FT_BST_ITERATOR_HPP
+#define FT_BST_ITERATOR_HPP
 
 #include "utility.hpp"
 

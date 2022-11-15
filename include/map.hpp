@@ -51,8 +51,10 @@ namespace ft
 
 			friend class map;
 
-		public:
+		protected:
 			value_compare (Compare c) : comp (c) {}
+
+		public:
 
 			bool operator() (const value_type &lhs, const value_type &rhs) const
 			{
@@ -104,9 +106,8 @@ namespace ft
 		tree _tree;
 
 	public:
-		map () : _tree (value_compare (Compare ()), allocator_type ()) {}
 
-		explicit map (const Compare &comp, const allocator_type &alloc = allocator_type ()) :
+		explicit map (const Compare &comp = Compare (), const allocator_type &alloc = allocator_type ()) :
 			_tree (value_compare (comp), alloc) {}
 		
 		template<typename InputIt>
@@ -131,7 +132,7 @@ namespace ft
 
 		iterator insert (iterator pos, const value_type &value)
 		{
-			(void)pos;	// I am not sure what this is for, since map is an ordered data structure
+			(void)pos;	//  I am not sure what this is for, since map is an ordered data structure
 
 			return insert (value).first;
 		}
@@ -185,12 +186,12 @@ namespace ft
 
 		iterator find (const Key &key)
 		{
-			return _tree.find (key, key_value_compare (_tree.value_comp ().comp));
+			return _tree.find (key, key_value_compare (key_comp ()));
 		}
 
 		const_iterator find (const Key &key) const
 		{
-			return _tree.find (key, key_value_compare (_tree.value_comp ().comp));
+			return _tree.find (key, key_value_compare (key_comp ()));
 		}
 
 		pair<iterator, iterator> equal_range (const Key &key)
@@ -208,7 +209,7 @@ namespace ft
 			{
 				for (lower = begin (); lower != end (); lower++)
 				{
-					if (_tree.value_comp ().comp (key, lower->first))
+					if (key_comp () (key, lower->first))
 						break;
 				}
 
@@ -233,7 +234,7 @@ namespace ft
 			{
 				for (lower = begin (); lower != end (); lower++)
 				{
-					if (_tree.value_comp ().comp (key, lower->first))
+					if (key_comp () (key, lower->first))
 						break;
 				}
 
@@ -251,7 +252,7 @@ namespace ft
 
 		T &at (const Key &key)
 		{
-			typename tree::iterator it = _tree.find (key, key_value_compare (_tree.value_comp ().comp));
+			typename tree::iterator it = _tree.find (key, key_value_compare (key_comp ()));
 			if (it == _tree.end ())
 				throw std::out_of_range ("key was not found in the map");
 		
@@ -260,7 +261,7 @@ namespace ft
 
 		const T &at (const Key &key) const
 		{
-			const_iterator it = _tree.find (key, key_value_compare (_tree.value_comp ().comp));
+			const_iterator it = _tree.find (key, key_value_compare (key_comp ()));
 			if (it == _tree.end ())
 				throw std::out_of_range ("key was not found in the map");
 		

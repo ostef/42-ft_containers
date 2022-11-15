@@ -3,7 +3,7 @@
 
 #include "utility.hpp"
 #include "iterator.hpp"
-#include "bst.hpp"
+#include "bst_iterator.hpp"
 
 namespace ft
 {
@@ -18,9 +18,7 @@ namespace ft
 		char balance_factor;
 		value_type value;
 
-		explicit avl_node () :
-			parent (NULL), left (NULL), right (NULL), balance_factor (0), value () {}
-		explicit avl_node (const value_type &val) :
+		explicit avl_node (const value_type &val = value_type ()) :
 			parent (NULL), left (NULL), right (NULL), balance_factor (0), value (val) {}
 		avl_node (const avl_node &other) :
 			parent (other.parent), left (other.left), right (other.right), balance_factor (other.balance_factor), value (other.value) {}
