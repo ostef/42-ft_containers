@@ -12,4 +12,9 @@ int main()
 	
 	print_vector (vec1);
 	print_vector (vec2);
+
+	std::swap (vec1, vec2);
+
+	print_vector (vec1);
+	print_vector (vec2);
 }

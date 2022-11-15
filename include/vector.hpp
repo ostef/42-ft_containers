@@ -6,7 +6,7 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 20:23:47 by soumanso          #+#    #+#             */
-/*   Updated: 2022/11/13 14:51:07 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/11/15 13:45:46 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -587,6 +587,15 @@ namespace ft
 	bool operator>= (const vector<T, TAllocator> &lhs, const vector<T, TAllocator> &rhs)
 	{
 		return lhs > rhs || lhs == rhs;
+	}
+}
+
+namespace std
+{
+	template<class T, class Alloc>
+	void swap (ft::vector<T, Alloc> &lhs, ft::vector<T, Alloc> &rhs)
+	{
+		lhs.swap (rhs);
 	}
 }
 
