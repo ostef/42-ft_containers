@@ -146,11 +146,11 @@ namespace ft
 		// Use set_root instead, to update the before begin and past end nodes.
 		node_type *_root;
 
-		// These two are pointers, because we need to be able to swap
-		// them so they belong to a different tree. Yeah that's fucked up,
+		// These two are pointers allocated using the allocator, because we need to be
+		// able to swap them so they belong to a different tree. Yeah that's a bit nasty,
 		// but this is so iterators from the tree before a swap point to
-		// the swapped tree after the swap. This seems like a shitty edge case,
-		// but we need to handle it anyways. Fuck C++, fuck all this.
+		// the swapped tree after the swap. This seems like a small edge case,
+		// but we need to handle it anyways.
 		node_type *_before_begin;
 		node_type *_past_end;
 
