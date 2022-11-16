@@ -45,7 +45,7 @@ int main ()
 		print_expr (it == it1[i]);
 	}
 
-	std::sawp (map1, map2);
+	std::swap (map1, map2);
 
 	print_map (map1);
 	print_map (map2);

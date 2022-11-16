@@ -19,6 +19,7 @@ srcs="srcs"
 CC="clang++"
 CFLAGS="-Wall -Wextra -Werror"
 CFLAGS+=" -std=c++98"	# Comment this line for is_integral tests
+CFLAGS+=" -g3"
 #CFLAGS+=" -fsanitize=address -g3"
 #CFLAGS+=" -fsanitize=leak -g3"
 

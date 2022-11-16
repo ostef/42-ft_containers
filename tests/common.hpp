@@ -24,6 +24,7 @@
 #include <iostream>
 #include <string>
 #include <list>
+#include <cstdlib>
 
 #define print_expr(expr) std::cout << #expr " = " << (expr) << std::endl;
 

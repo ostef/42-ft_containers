@@ -327,6 +327,13 @@ namespace ft
 		{
 			return lhs._tree >= rhs._tree;;
 		}
+
+	#ifdef TEST_FT
+		bool ensure_balance_factor_correctness () const
+		{
+			return _tree.ensure_balance_factor_correctness ();
+		}
+	#endif
 	};
 }
 

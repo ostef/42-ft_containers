@@ -22,4 +22,5 @@ int main()
 	print_expr (std::distance (map1.begin (), it4.first));
 	print_expr (it5.second);
 	print_expr (std::distance (map1.begin (), it5.first));
+	print_expr (ensure_balance_factor_correctness (map1));
 }

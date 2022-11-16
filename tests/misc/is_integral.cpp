@@ -30,6 +30,8 @@ int main()
 	print_expr (NS::is_integral<wchar_t>::value);
 	print_expr (NS::is_integral<size_t>::value);
 	print_expr (NS::is_integral<ptrdiff_t>::value);
+	// We can't really have these below, since they're not part of C++98
+	/*
 	print_expr (NS::is_integral<uint8_t>::value);
 	print_expr (NS::is_integral<int8_t>::value);
 	print_expr (NS::is_integral<uint16_t>::value);
@@ -38,4 +40,5 @@ int main()
 	print_expr (NS::is_integral<int32_t>::value);
 	print_expr (NS::is_integral<uint64_t>::value);
 	print_expr (NS::is_integral<int64_t>::value);
+	*/
 }

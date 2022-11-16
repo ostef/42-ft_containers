@@ -18,4 +18,23 @@ void _print_map (const NS::map<T, Compare, Allocator> &map, const std::string &n
 	std::cout << "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n" << std::endl;
 }
 
+#ifdef TEST_STD
+
+template<typename Key, typename T, typename Comp, typename Alloc>
+bool ensure_balance_factor_correctness(const std::map<Key, T, Comp, Alloc> &map)
+{
+	(void)map;
+	return true;
+}
+
+#else
+
+template<typename Key, typename T, typename Comp, typename Alloc>
+bool ensure_balance_factor_correctness(const ft::map<Key, T, Comp, Alloc> &map)
+{
+	return map.ensure_balance_factor_correctness ();
+}
+
+#endif
+
 #endif

@@ -6,7 +6,7 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/21 14:47:05 by soumanso          #+#    #+#             */
-/*   Updated: 2022/11/13 14:57:21 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/11/16 17:04:25 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ namespace ft
 
 	// These need special treatment, as they don't seem to be aliases for all of the above integer types...
 	DECL_INTEGRAL (wchar_t);
-	DECL_INTEGRAL (int8_t);
+	//DECL_INTEGRAL (int8_t);	// We can't have this, since this does not exist in C++98
 
 #undef DECL_INTEGRAL
 }

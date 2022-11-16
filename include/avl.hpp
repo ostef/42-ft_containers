@@ -119,6 +119,16 @@ namespace ft
 		{
 			return const_cast<avl_node *> (const_cast<const avl_node *> (this)->predecessor ());
 		}
+
+		size_t height () const
+		{
+			size_t left_height = left ? left->height () : 0;
+			size_t right_height = right ? right->height () : 0;
+			if (left_height > right_height)
+				return left_height + 1;
+			
+			return right_height + 1;
+		}
 	};
 
 	template<
@@ -817,6 +827,30 @@ namespace ft
 			_alloc.destroy (target);
 			_alloc.deallocate (target, 1);
 		}
+	
+	#ifdef TEST_FT
+	public:
+		bool ensure_balance_factor_correctness () const
+		{
+			if (!_root)
+				return true;
+
+			node_type *node = _root->leftmost ();
+			while (node)
+			{
+				size_t left_height = node->left ? node->left->height () : 0;
+				size_t right_height = node->right ? node->right->height () : 0;
+				char expected = (char)((ptrdiff_t)right_height - (ptrdiff_t)left_height);
+				if (node->balance_factor != expected)
+					return false;
+
+				node = node->successor ();
+			}
+
+			return true;
+		}
+
+	#endif
 	};
 
 	template<class T, class Compare, class TAllocator>
